@@ -1,15 +1,13 @@
-
-import './App.css'
+// App.tsx
+import { AuthProvider } from "./context/AuthContext";
+import AppContent from "./components/AppContent";
 
 function App() {
-
   return (
-    <>
-    <h1 className="text-3xl font-bold text-red-500">
-      Tailwind funziona 🚀
-    </h1>
-    </>
-  )
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
+  );
 }
 
-export default App
+export default App;
