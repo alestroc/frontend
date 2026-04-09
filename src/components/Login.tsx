@@ -152,33 +152,30 @@
 import React, { useState } from "react";
 import logo from "../assets/logo.svg";
 import axios from "axios";
-import { useAuth } from "../context/AuthContext";
 
-export default function LoginPage() {
-  const { setAuth, setIsLoggedIn } = useAuth();
+export default function LoginPage({ isLogged }: { isLogged: React.Dispatch<React.SetStateAction<boolean>> }) {
   const [email, setEmail] = useState("testts@studium.it");
   const [password, setPassword] = useState("Studium2026!");
   const [error, setError] = useState("");
   const [saveLogin, setSaveLogin] = useState(false);
 
-  function handleSubmit(e) {
+  function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!email || !password) {
       setError("Inserisci email e password.");
       return;
     }
-    setError("");
     axios
       .post("http://studium.backend/api/login", { email, password })
       .then((response) => {
-        if (response.data.result) {
-          setAuth(response.data.data);
-          setIsLoggedIn(true);
-
-          console.log("risposta" + response.data);
-        } else {
+        const r = response.data;
+        if (!r.result) {
           setError("Credenziali non valide.");
+          return;
         }
+        // console.log(typeof r.data);
+        localStorage.setItem("dati", JSON.stringify(r.data));
+        isLogged(true);
       })
       .catch(() => setError("Errore di connessione."));
   }
