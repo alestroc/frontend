@@ -1,68 +1,80 @@
 import { useState } from "react";
-
-export interface TimeEntry {
-  giorno: string; // "YYYY-MM-DD"
-  idcommessa: string;
-  nomecommessa: string;
-  idarticolo: string;
-  nomearticolo: string;
-  ore: number;
-  nota: string;
-}
+import type { AppSettings, TimeEntry } from "../../types";
 
 interface CalendarProps {
   entries: TimeEntry[];
+  settings: AppSettings | null;
 }
 
 const DAYS_OF_WEEK = ["Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"];
 const MONTHS = [
-  "Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno",
-  "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre",
+  "Gennaio",
+  "Febbraio",
+  "Marzo",
+  "Aprile",
+  "Maggio",
+  "Giugno",
+  "Luglio",
+  "Agosto",
+  "Settembre",
+  "Ottobre",
+  "Novembre",
+  "Dicembre",
 ];
 
-export default function Calendar({ entries }: CalendarProps) {
+export default function Calendar({ entries, settings }: CalendarProps) {
   const today = new Date();
   const [year, setYear] = useState(today.getFullYear());
-  const [month, setMonth] = useState(today.getMonth()); // 0-based
+  const [month, setMonth] = useState(today.getMonth()); // 0=Gennaio  11=Dicembre
 
   // Group entries by day string "YYYY-MM-DD"
-  const entriesByDay = entries.reduce<Record<string, TimeEntry[]>>((acc, entry) => {
-    if (!acc[entry.giorno]) acc[entry.giorno] = [];
-    acc[entry.giorno].push(entry);
-    return acc;
-  }, {});
+  const entriesByDay = entries.reduce<Record<string, TimeEntry[]>>(
+    (acc, entry) => {
+      if (!acc[entry.giorno]) acc[entry.giorno] = [];
+      acc[entry.giorno].push(entry);
+      return acc;
+    },
+    {},
+  );
 
-  // Build the grid: Monday-first week
+  //
   const firstDay = new Date(year, month, 1);
   const lastDay = new Date(year, month + 1, 0);
+  // ricavato da getSettings - giorni, rispetto a oggi, in cui è possibile timbrare
+  const daysBefore = new Date();
+  daysBefore.setDate(today.getDate() - 120);
 
-  // 0=Sun…6=Sat → convert to 0=Mon…6=Sun
+  // trasforma 0 = Dom ... 6 = Lun a 0 = Lun … 6 = Dom
   const startOffset = (firstDay.getDay() + 6) % 7;
   const totalDays = lastDay.getDate();
 
   const cells: (number | null)[] = [
+    //inserimento delle caselle vuote prima del 1° del mese
     ...Array(startOffset).fill(null),
     ...Array.from({ length: totalDays }, (_, i) => i + 1),
   ];
 
-  // Pad to complete last row
+  // Inserimento delle caselle vuote dopo la fine del mese
   while (cells.length % 7 !== 0) cells.push(null);
 
   function prevMonth() {
-    if (month === 0) { setMonth(11); setYear(y => y - 1); }
-    else setMonth(m => m - 1);
+    if (month === 0) {
+      setMonth(11);
+      setYear((y) => y - 1);
+    } else setMonth((m) => m - 1);
   }
 
   function nextMonth() {
-    if (month === 11) { setMonth(0); setYear(y => y + 1); }
-    else setMonth(m => m + 1);
+    if (month === 11) {
+      setMonth(0);
+      setYear((y) => y + 1);
+    } else setMonth((m) => m + 1);
   }
 
   function handleDayClick(day: number) {
-    const date = new Date(year, month, day);
-    console.log("Giorno selezionato:", date.toISOString().slice(0, 10));
+    console.log("Giorno selezionato:", toDayKey(day));
   }
-
+  //ritorna il formato YYYY-MM-DD dato un giorno (YYYY-MM si basano su quale mese e anno stiamo attualmente visualizzando sul calendario)
   function toDayKey(day: number): string {
     return `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
   }
@@ -72,7 +84,7 @@ export default function Calendar({ entries }: CalendarProps) {
   return (
     <div className="w-full max-w-2xl mx-auto select-none">
       {/* Header navigazione */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center mb-4">
         <button
           onClick={prevMonth}
           className="px-3 py-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 text-lg"
@@ -91,10 +103,13 @@ export default function Calendar({ entries }: CalendarProps) {
       </div>
 
       {/* Griglia */}
-      <div className="grid grid-cols-7 gap-1">
+      <div className="grid grid-cols-7">
         {/* Intestazione giorni */}
         {DAYS_OF_WEEK.map((d) => (
-          <div key={d} className="text-center text-xs font-semibold text-gray-500 py-1">
+          <div
+            key={d}
+            className="text-center text-xs font-semibold text-gray-500 py-1"
+          >
             {d}
           </div>
         ))}
@@ -106,34 +121,75 @@ export default function Calendar({ entries }: CalendarProps) {
           const key = toDayKey(day);
           const dayEntries = entriesByDay[key] ?? [];
           const isToday = key === todayKey;
+          const dayFormatDate = new Date(year, month, day);
+          // i % 7: 0=Lun … 5=Sab, 6=Dom
+          const colIndex = i % 7;
+          const isSaturday = colIndex === 5;
+          const isSunday = colIndex === 6;
+          const isDisabled =
+            dayFormatDate < daysBefore ||
+            dayFormatDate > today ||
+            (isSaturday && !settings?.allowSaturday) ||
+            (isSunday && !settings?.allowSunday);
+
+          const totalHours = dayEntries.reduce(
+            (sum, e) => sum + Number(e.ore),
+            0,
+          );
 
           return (
             <div
               key={key}
-              onClick={() => handleDayClick(day)}
+              onClick={() => !isDisabled && handleDayClick(day)}
+              style={{
+                display: "grid",
+                gridTemplateRows: "auto 1fr auto",
+                height: "5rem",
+              }}
               className={[
-                "min-h-16 p-1 rounded-md border cursor-pointer transition",
-                "hover:border-orange-400",
+                "p-1 border transition overflow-hidden",
+                isDisabled
+                  ? "opacity-40 cursor-not-allowed"
+                  : "cursor-pointer hover:border-orange-500",
                 isToday
-                  ? "border-orange-500 bg-orange-50 dark:bg-orange-900/20"
+                  ? "bg-orange-500 hover:bg-orange-500"
                   : "border-gray-200 dark:border-gray-700",
               ].join(" ")}
             >
-              <div className={[
-                "text-xs font-semibold mb-1",
-                isToday ? "text-orange-600" : "text-gray-700 dark:text-gray-300",
-              ].join(" ")}>
+              {/* Intestazione: numero del giorno */}
+              <div
+                className={[
+                  "text-xs font-semibold",
+                  isToday
+                    ? "text-orange-600"
+                    : "text-gray-700 dark:text-gray-300",
+                ].join(" ")}
+              >
                 {day}
               </div>
-              {dayEntries.map((entry, j) => (
+
+              {/* Corpo: entries scorrevoli */}
+              <div className="overflow-y-auto">
+                {dayEntries.map((entry, j) => (
+                  <div
+                    key={j}
+                    className="text-xs truncate rounded px-1 bg-orange-100 dark:bg-orange-800/40 text-orange-800 dark:text-orange-200 mb-0.5"
+                    title={`${entry.nomecommessa} — ${entry.ore}h`}
+                  >
+                    {entry.ore}h {entry.nomecommessa}
+                  </div>
+                ))}
+              </div>
+              {totalHours != 0 && (
                 <div
-                  key={j}
-                  className="text-xs truncate rounded px-1 bg-orange-100 dark:bg-orange-800/40 text-orange-800 dark:text-orange-200 mb-0.5"
-                  title={`${entry.nomecommessa} — ${entry.ore}h`}
+                  className={[
+                    "border-t w-100 text-center border-gray-200 dark:border-gray-600 text-xs font-semibold text-black dark:text-gray-300",
+                    totalHours == 8 ? "bg-green-500" : "bg-red-500",
+                  ].join(" ")}
                 >
-                  {entry.ore}h {entry.nomecommessa}
+                  {totalHours}h
                 </div>
-              ))}
+              )}
             </div>
           );
         })}
