@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { AppSettings, TimeEntry } from "../../types";
+import EntryBadge from "./EntryBadge";
 
 interface CalendarProps {
   entries: TimeEntry[];
@@ -27,7 +28,7 @@ export default function Calendar({ entries, settings }: CalendarProps) {
   const [year, setYear] = useState(today.getFullYear());
   const [month, setMonth] = useState(today.getMonth()); // 0=Gennaio  11=Dicembre
 
-  // Group entries by day string "YYYY-MM-DD"
+  // Dizionario per raggruppare le entries per giorni -- "YYYY-MM-DD"
   const entriesByDay = entries.reduce<Record<string, TimeEntry[]>>(
     (acc, entry) => {
       if (!acc[entry.giorno]) acc[entry.giorno] = [];
@@ -37,14 +38,14 @@ export default function Calendar({ entries, settings }: CalendarProps) {
     {},
   );
 
-  //
+  // dati per la creazione del calendario
   const firstDay = new Date(year, month, 1);
   const lastDay = new Date(year, month + 1, 0);
   // ricavato da getSettings - giorni, rispetto a oggi, in cui è possibile timbrare
   const daysBefore = new Date();
   daysBefore.setDate(today.getDate() - 120);
 
-  // trasforma 0 = Dom ... 6 = Lun a 0 = Lun … 6 = Dom
+  // trasforma da 0 = Dom a 0 = Lun
   const startOffset = (firstDay.getDay() + 6) % 7;
   const totalDays = lastDay.getDate();
 
@@ -70,7 +71,7 @@ export default function Calendar({ entries, settings }: CalendarProps) {
       setYear((y) => y + 1);
     } else setMonth((m) => m + 1);
   }
-
+  // WIP -- COMPONENTE : MODALE - API : /addTimeEntries
   function handleDayClick(day: number) {
     console.log("Giorno selezionato:", toDayKey(day));
   }
@@ -82,16 +83,15 @@ export default function Calendar({ entries, settings }: CalendarProps) {
   const todayKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
 
   return (
-    <div className="w-full max-w-2xl mx-auto select-none">
-      {/* Header navigazione */}
-      <div className="flex items-center mb-4">
+    <div className="flex flex-col w-full h-full select-none">
+      <div className="shrink-0 flex items-center gap-2 mb-2">
         <button
           onClick={prevMonth}
           className="px-3 py-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 text-lg"
         >
           ‹
         </button>
-        <span className="font-semibold text-lg">
+        <span className="font-semibold text-lg text-center w-40">
           {MONTHS[month]} {year}
         </span>
         <button
@@ -100,10 +100,21 @@ export default function Calendar({ entries, settings }: CalendarProps) {
         >
           ›
         </button>
+        <button
+          onClick={() => {
+            setYear(today.getFullYear());
+            setMonth(today.getMonth());
+          }}
+          className="px-3 py-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 text-sm"
+        >
+          Oggi
+        </button>
       </div>
 
-      {/* Griglia */}
-      <div className="grid grid-cols-7">
+      <div
+        className="flex-1 grid grid-cols-7 min-h-0"
+        style={{ gridTemplateRows: `auto repeat(${cells.length / 7}, 1fr)` }}
+      >
         {/* Intestazione giorni */}
         {DAYS_OF_WEEK.map((d) => (
           <div
@@ -141,11 +152,7 @@ export default function Calendar({ entries, settings }: CalendarProps) {
             <div
               key={key}
               onClick={() => !isDisabled && handleDayClick(day)}
-              style={{
-                display: "grid",
-                gridTemplateRows: "auto 1fr auto",
-                height: "5rem",
-              }}
+              style={{ display: "grid", gridTemplateRows: "auto 1fr auto" }}
               className={[
                 "p-1 border transition overflow-hidden",
                 isDisabled
@@ -156,7 +163,7 @@ export default function Calendar({ entries, settings }: CalendarProps) {
                   : "border-gray-200 dark:border-gray-700",
               ].join(" ")}
             >
-              {/* Intestazione: numero del giorno */}
+              {/* numero del giorno */}
               <div
                 className={[
                   "text-xs font-semibold",
@@ -168,18 +175,13 @@ export default function Calendar({ entries, settings }: CalendarProps) {
                 {day}
               </div>
 
-              {/* Corpo: entries scorrevoli */}
+              {/* entries registrate */}
               <div className="overflow-y-auto">
-                {dayEntries.map((entry, j) => (
-                  <div
-                    key={j}
-                    className="text-xs truncate rounded px-1 bg-orange-100 dark:bg-orange-800/40 text-orange-800 dark:text-orange-200 mb-0.5"
-                    title={`${entry.nomecommessa} — ${entry.ore}h`}
-                  >
-                    {entry.ore}h {entry.nomecommessa}
-                  </div>
+                {dayEntries.map((entry) => (
+                  <EntryBadge key={entry.idcommessa + entry.idarticolo} entry={entry} />
                 ))}
               </div>
+              {/* mostra il badge delle ore registrate in quel giorno, se presenti */}
               {totalHours != 0 && (
                 <div
                   className={[
