@@ -7,22 +7,25 @@ import type { AppSettings, TimeEntry } from "./types";
 import { checkIsLogged, deleteLocalStorageData } from "./functions/functions";
 import { getEntries } from "./functions/entries";
 import { getSettings } from "./functions/settings";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import CalendarViewWeekIcon from "@mui/icons-material/CalendarViewWeek";
+import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 
 function App() {
   const [isLogged, setIsLogged] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [selected, setSelected] = useState("");
+  const [selected, setSelected] = useState("Mensile");
   const [settings, setSettings] = useState<AppSettings | null>(null);
   const [entries, setEntries] = useState<TimeEntry[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   const sideBarButton = [
-    "Aggiungi attività",
+    "Aggiungi attività - WIP",
     "Mensile",
     "Settimanale",
     "Giornata",
-    "Statistiche",
-    "Scarica Report",
+    "Statistiche - WIP",
+    "Scarica Report - WIP",
     "Logout",
   ];
 
@@ -61,6 +64,10 @@ function App() {
   }, [isLogged]);
 
   function handleSidebar(e) {
+    if (!e) {
+      return false;
+    }
+    //Selezione del filtro sul calendario
     const buttonValue = e.currentTarget.textContent;
     if (
       buttonValue === "Mensile" ||
@@ -74,16 +81,8 @@ function App() {
       case "Aggiungi attività":
         //CREA E CAMBIA STATO PER MOSTRARE MODALE DI INSERIMENTO
         break;
-      case "Mensile":
-        console.log("visione mensile");
-        break;
-      case "Settimanale":
-        console.log("visione settimanale");
-
-        break;
-      case "Giornata":
-        console.log("visione giornaliera");
-
+      case "Scarica Report - WIP":
+        console.log("Bottone Cliccato");
         break;
       case "Logout":
         deleteLocalStorageData();
@@ -110,29 +109,38 @@ function App() {
                 return (
                   <button
                     className={[
-                      element == "Aggiungi attività"
-                        ? sideBarButtonStyle.addAttivita
+                      sideBarStyle.button.default,
+                      element == "Aggiungi attività - WIP"
+                        ? sideBarStyle.button.addAttivita
                         : element == "Logout"
-                          ? sideBarButtonStyle.logout
-                          : sideBarButtonStyle.default,
+                          ? sideBarStyle.button.logout
+                          : "",
                       selected === element ? "bg-blue-500" : "",
                     ].join(" ")}
                     onClick={(event) => {
-                      console.log(event.currentTarget.textContent);
                       handleSidebar(event);
                     }}
                   >
+                    {element === "Mensile" ? (
+                      <CalendarMonthIcon className={sideBarStyle.icon} />
+                    ) : element === "Settimanale" ? (
+                      <CalendarViewWeekIcon className={sideBarStyle.icon} />
+                    ) : element === "Giornata" ? (
+                      <CalendarTodayIcon className={sideBarStyle.icon} />
+                    ) : (
+                      ""
+                    )}
                     {element}
                   </button>
                 );
               })}
             </div>
           </Sidebar>
-          <Calendar entries={entries} settings={settings} />
+          <Calendar entries={entries} settings={settings} view={selected} />
         </div>
       )}
       {error && (
-        <div className=" absolute top-2 right-2 justify-center w-15 h-15">
+        <div className=" absolute top-2 right-2 justify-center w-[20%] h-15">
           <div className="flex flex-col">
             <div className="text-center items-center p-6 rounded-lg border border-red-300 bg-red-50 dark:bg-red-900/20 dark:border-red-800">
               <p className="text-sm font-semibold text-red-700 dark:text-red-400">
@@ -148,8 +156,11 @@ function App() {
 
 export default App;
 
-const sideBarButtonStyle = {
-  default: "border-l rounded-md p-2 w-full ",
-  addAttivita: " border-l rounded-md p-2 w-full ",
-  logout: " border-l rounded-md p-2 w-full bg-red-500",
+const sideBarStyle = {
+  button: {
+    default: "border-l rounded-md p-2 w-full ",
+    addAttivita: " bg-blue-500 ",
+    logout: " border-l rounded-md p-2 w-full bg-red-500",
+  },
+  icon: "absolute left-5",
 };
