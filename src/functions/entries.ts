@@ -1,5 +1,5 @@
 import type { TimeEntry } from "../types";
-import { checkLocalStorageData } from "../functions";
+import { checkLocalStorageData } from "./functions";
 import { BASE_URL } from "./config";
 
 interface ApiResponse<T> {

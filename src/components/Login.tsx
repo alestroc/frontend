@@ -1,6 +1,6 @@
 import { useState, type Dispatch, type SetStateAction } from "react";
 import logo from "../assets/logo.svg";
-import { BASE_URL } from "../api/config";
+import { BASE_URL } from "../functions/config";
 
 export default function LoginPage({
   isLogged,
@@ -78,7 +78,7 @@ export default function LoginPage({
 
           <button
             type="submit"
-            className="mt-4 w-full py-2.5 text-sm font-bold text-white rounded-full bg-orange-500 hover:bg-orange-600 transition"
+            className="mt-4 w-full py-2.5 text-sm font-bold text-white rounded-full bg-green-500 hover:bg-orange-600 transition"
           >
             Accedi
           </button>

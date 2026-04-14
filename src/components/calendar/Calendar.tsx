@@ -177,11 +177,8 @@ export default function Calendar({ entries, settings }: CalendarProps) {
 
               {/* entries registrate */}
               <div className="overflow-y-auto">
-                {dayEntries.map((entry) => (
-                  <EntryBadge
-                    key={entry.idcommessa + entry.idarticolo}
-                    entry={entry}
-                  />
+                {dayEntries.map((entry, index) => (
+                  <EntryBadge key={index} entry={entry} />
                 ))}
               </div>
               {/* mostra il badge delle ore registrate in quel giorno, se presenti */}

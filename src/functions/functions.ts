@@ -1,5 +1,5 @@
-import { BASE_URL } from "./api/config";
-import type { LocalData } from "./types";
+import { BASE_URL } from "./config";
+import type { LocalData } from "../types";
 
 export type { LocalData };
 
