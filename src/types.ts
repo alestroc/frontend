@@ -7,6 +7,15 @@ export interface AppSettings {
   allowSunday: boolean;
 }
 
+export interface LocalData {
+  idpersonale: string;
+  localid: string;
+  name: string;
+  sector: string;
+  token: string;
+  user: number;
+}
+
 export interface TimeEntry {
   giorno: string; // "YYYY-MM-DD"
   idcommessa: string;

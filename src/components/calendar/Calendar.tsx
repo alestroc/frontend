@@ -41,9 +41,9 @@ export default function Calendar({ entries, settings }: CalendarProps) {
   // dati per la creazione del calendario
   const firstDay = new Date(year, month, 1);
   const lastDay = new Date(year, month + 1, 0);
-  // ricavato da getSettings - giorni, rispetto a oggi, in cui è possibile timbrare
+  // giorni prima di oggi in cui è possibile timbrare, ricavato da getSettings
   const daysBefore = new Date();
-  daysBefore.setDate(today.getDate() - 120);
+  daysBefore.setDate(today.getDate() - (settings?.daysBefore ?? 0));
 
   // trasforma da 0 = Dom a 0 = Lun
   const startOffset = (firstDay.getDay() + 6) % 7;
@@ -178,7 +178,10 @@ export default function Calendar({ entries, settings }: CalendarProps) {
               {/* entries registrate */}
               <div className="overflow-y-auto">
                 {dayEntries.map((entry) => (
-                  <EntryBadge key={entry.idcommessa + entry.idarticolo} entry={entry} />
+                  <EntryBadge
+                    key={entry.idcommessa + entry.idarticolo}
+                    entry={entry}
+                  />
                 ))}
               </div>
               {/* mostra il badge delle ore registrate in quel giorno, se presenti */}
