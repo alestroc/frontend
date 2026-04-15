@@ -1,0 +1,5 @@
+{
+  "tailwindCSS.experimental.configFile": {
+    "frontend/src/index.css": "frontend/**"
+  }
+}

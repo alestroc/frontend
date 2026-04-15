@@ -82,26 +82,26 @@ export default function Calendar({ entries, settings, view }: CalendarProps) {
         onClick={() => !disabled && handleDayClick(key)}
         style={{ display: "grid", gridTemplateRows: "auto 1fr auto" }}
         className={[
-          "p-1 border transition overflow-hidden",
+          "p-1 border transition overflow-hidden ",
           disabled
             ? "opacity-40 cursor-not-allowed"
             : "cursor-pointer hover:border-orange-500",
           isToday
-            ? "bg-orange-500 hover:bg-orange-500"
+            ? "bg-[#4868a0] hover:bg-[#3d5989]"
             : "border-gray-200 dark:border-gray-700",
         ].join(" ")}
       >
         <div
           className={[
-            "text-xs font-semibold",
-            isToday ? "text-orange-600" : "text-gray-700 dark:text-gray-300",
+            "text-xs font-semibold mb-1",
+            isToday ? "text-black" : "text-white",
           ].join(" ")}
         >
           {date.getDate()}
         </div>
-        <div className="overflow-y-auto">
+        <div className="flex flex-col overflow-auto">
           {dayEntries.map((entry, i) => (
-            <EntryBadge key={i} entry={entry} />
+            <EntryBadge key={i} entry={entry} view={view} />
           ))}
         </div>
         {totalHours !== 0 && (
@@ -217,7 +217,7 @@ export default function Calendar({ entries, settings, view }: CalendarProps) {
           {DAYS_OF_WEEK.map((d) => (
             <div
               key={d}
-              className="text-center text-xs font-semibold text-gray-500 py-1"
+              className="text-center text-xs font-semibold border border-gray-700 text-white py-1"
             >
               {d}
             </div>
@@ -231,13 +231,13 @@ export default function Calendar({ entries, settings, view }: CalendarProps) {
       {/* Vista settimanale */}
       {view === "Settimanale" && (
         <div
-          className="flex-1 grid grid-cols-7 min-h-0"
+          className="flex-1 max-h-[50%] grid grid-cols-7 min-h-0"
           style={{ gridTemplateRows: "auto 1fr" }}
         >
           {weekDays.map((d) => (
             <div
               key={dateToKey(d)}
-              className="text-center text-xs font-semibold text-gray-500 py-1"
+              className="text-center text-xs font-semibold text-white py-1"
             >
               {DAYS_OF_WEEK[(d.getDay() + 6) % 7]} {d.getDate()}
             </div>

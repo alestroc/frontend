@@ -1,22 +1,30 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import logo from "../assets/logo.svg";
+import { deleteLocalStorageData } from "../functions/functions";
+import LogoutIcon from "@mui/icons-material/Logout";
 
 interface SidebarProps {
   children?: React.ReactNode;
+  setIsLogged: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export default function Sidebar({ children }: SidebarProps) {
+export default function Sidebar({ children, setIsLogged }: SidebarProps) {
   const [collapsed, setCollapsed] = useState(false);
+
+  function Logout() {
+    deleteLocalStorageData();
+    setIsLogged(false);
+  }
 
   return (
     <div
       className={[
-        "flex flex-col h-full border-r border-black-200 dark:border-gray-700 bg-black dark:bg-gray-900 transition-all duration-300",
+        "flex flex-col h-full border-r bg-black border-black-200 transition-all duration-300",
         collapsed ? "w-12" : "w-56",
       ].join(" ")}
     >
       {/* Header Sidebar */}
-      <div className="flex border-b border-gray-200">
+      <div className="flex border-b justify-between border-gray-200">
         {collapsed ? (
           ""
         ) : (
@@ -44,11 +52,25 @@ export default function Sidebar({ children }: SidebarProps) {
           </span>
         </button>
       </div>
-
       {/* Contenuto */}
       <div className="flex-1 overflow-hidden text-white font-bold">
         {!collapsed && children}
       </div>
+      {!collapsed ? (
+        <button
+          className=" border-red-500 p-2 w-full bg-red-500 hover:cursor-pointer"
+          onClick={Logout}
+        >
+          Logout
+        </button>
+      ) : (
+        <div
+          title="Logout"
+          className="flex items-center justify-center h-8 w-full  bg-red-700 hover:bg-red-800"
+        >
+          <LogoutIcon onClick={Logout} />
+        </div>
+      )}
     </div>
   );
 }

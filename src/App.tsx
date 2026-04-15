@@ -10,6 +10,7 @@ import { getSettings } from "./functions/settings";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import CalendarViewWeekIcon from "@mui/icons-material/CalendarViewWeek";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
+import Modal from "./components/Modal";
 
 function App() {
   const [isLogged, setIsLogged] = useState(false);
@@ -18,6 +19,7 @@ function App() {
   const [settings, setSettings] = useState<AppSettings | null>(null);
   const [entries, setEntries] = useState<TimeEntry[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [isModalActive, setIsModalActive] = useState(false);
 
   const sideBarButton = [
     "Aggiungi attività - WIP",
@@ -26,7 +28,6 @@ function App() {
     "Giornata",
     "Statistiche - WIP",
     "Scarica Report - WIP",
-    "Logout",
   ];
 
   useEffect(() => {
@@ -78,8 +79,9 @@ function App() {
     }
 
     switch (buttonValue) {
-      case "Aggiungi attività":
-        //CREA E CAMBIA STATO PER MOSTRARE MODALE DI INSERIMENTO
+      case "Aggiungi attività - WIP":
+        setIsModalActive(true);
+        console.log(isModalActive);
         break;
       case "Scarica Report - WIP":
         console.log("Bottone Cliccato");
@@ -101,20 +103,18 @@ function App() {
       {!isLogged ? (
         <LoginPage isLogged={setIsLogged} />
       ) : (
-        <div className="flex flex-row w-full h-full">
-          <Sidebar>
-            {/* sideBarButton */}
-            <div className="flex flex-col p-2 gap-5 justify-start h-full mt-5">
+        <div className="flex flex-row bg-slate-800 w-full h-full overflow-auto">
+          {isModalActive ? <Modal entries={entries} settings={settings} /> : ""}
+          <Sidebar setIsLogged={setIsLogged}>
+            <div className="flex flex-col p-2 gap-5 justify-start mt-5">
               {sideBarButton.map((element) => {
                 return (
                   <button
                     className={[
                       sideBarStyle.button.default,
-                      element == "Aggiungi attività - WIP"
+                      element == sideBarButton[0]
                         ? sideBarStyle.button.addAttivita
-                        : element == "Logout"
-                          ? sideBarStyle.button.logout
-                          : "",
+                        : "",
                       selected === element ? "bg-blue-500" : "",
                     ].join(" ")}
                     onClick={(event) => {
@@ -158,9 +158,8 @@ export default App;
 
 const sideBarStyle = {
   button: {
-    default: "border-l rounded-md p-2 w-full ",
+    default: "border-l rounded-md p-2 w-full hover:cursor-pointer",
     addAttivita: " bg-blue-500 ",
-    logout: " border-l rounded-md p-2 w-full bg-red-500",
   },
-  icon: "absolute left-5",
+  icon: "relative mr-2",
 };
