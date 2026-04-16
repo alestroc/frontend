@@ -32,7 +32,13 @@ export default function Calendar({
   selected = null,
 }: CalendarProps) {
   const today = new Date();
-  const [cursor, setCursor] = useState(today);
+  const [cursor, setCursor] = useState(() => {
+    if (selected) {
+      const d = new Date(selected);
+      if (!isNaN(d.getTime())) return d;
+    }
+    return today;
+  });
 
   //crea un dizionario raggruppando le entries in base al giorno
   const entriesByDay = entries.reduce<Record<string, TimeEntry[]>>(
@@ -43,6 +49,7 @@ export default function Calendar({
     },
     {},
   );
+
   const daysBefore = new Date(today);
   daysBefore.setDate(today.getDate() - (settings?.daysBefore ?? 0));
 
