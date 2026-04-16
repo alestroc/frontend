@@ -1,5 +1,11 @@
-export default function EntryBadge({ entry, view }) {
-  function StringToNum(hour) {
+import type { TimeEntry } from "../../types";
+
+interface EntryBadgeProp {
+  view: string;
+  entry: TimeEntry;
+}
+export default function EntryBadge({ entry, view }: EntryBadgeProp) {
+  function StringToNum(hour: string) {
     const numFromString = Number(hour);
     return numFromString;
   }
@@ -15,7 +21,7 @@ export default function EntryBadge({ entry, view }) {
       ].join(" ")}
       title={`${entry.nomecommessa} — ${StringToNum(entry.ore)}h`}
     >
-      {StringToNum(entry.ore)}h - {entry.nomecommessa} - {entry.idarticolo} -{" "}
+      {StringToNum(entry.ore)}h - {entry.nomecommessa} - {entry.idarticolo} -
       {entry.nota}
     </div>
   );

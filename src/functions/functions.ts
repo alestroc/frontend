@@ -45,3 +45,17 @@ export async function checkIsLogged(): Promise<boolean> {
     return false;
   }
 }
+
+//  ---------------------- FUNCTIONS USATE IN CALENDAR -----------------------------
+
+//passato un giorno, ritorna una stringa YYYY-MM-DD
+export function dateToKey(date: Date): string {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+}
+
+// trova il lunedì della settimana di cui viene passato il giorno
+export function getWeekStart(date: Date): Date {
+  const d = new Date(date);
+  d.setDate(d.getDate() - ((d.getDay() + 6) % 7));
+  return d;
+}

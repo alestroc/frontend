@@ -37,7 +37,7 @@ function App() {
         setError("Effettuare il login");
         setTimeout(() => {
           setError(null);
-        }, 1500);
+        }, 2000);
       }
       setIsLogged(loggedIn);
       setIsLoading(false);
@@ -104,7 +104,14 @@ function App() {
         <LoginPage isLogged={setIsLogged} />
       ) : (
         <div className="flex flex-row bg-slate-800 w-full h-full overflow-auto">
-          {isModalActive ? <Modal entries={entries} settings={settings} /> : ""}
+          {isModalActive && (
+            <Modal
+              entries={entries}
+              settings={settings}
+              isModalActive={setIsModalActive}
+              selectedDay={setSelected}
+            />
+          )}
           <Sidebar setIsLogged={setIsLogged}>
             <div className="flex flex-col p-2 gap-5 justify-start mt-5">
               {sideBarButton.map((element) => {

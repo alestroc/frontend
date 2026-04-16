@@ -1,11 +1,13 @@
 import { useState } from "react";
 import type { AppSettings, TimeEntry } from "../../types";
 import EntryBadge from "./EntryBadge";
+import { dateToKey, getWeekStart } from "../../functions/functions";
 
 interface CalendarProps {
   entries: TimeEntry[];
   settings: AppSettings | null;
   view: string;
+  selected?: Date | null;
 }
 
 const DAYS_OF_WEEK = ["Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"];
@@ -24,20 +26,15 @@ const MONTHS = [
   "Dicembre",
 ];
 
-//passato un giorno, ritorna una stringa YYYY-MM-DD
-function dateToKey(date: Date): string {
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
-}
-// trova il lunedì della settimana di cui viene passato il giorno
-function getWeekStart(date: Date): Date {
-  const d = new Date(date);
-  d.setDate(d.getDate() - ((d.getDay() + 6) % 7));
-  return d;
-}
-
-export default function Calendar({ entries, settings, view }: CalendarProps) {
+export default function Calendar({
+  entries,
+  settings,
+  view,
+  // selected = new Date(),
+}: CalendarProps) {
   const today = new Date();
-  const [cursor, setCursor] = useState(new Date(today));
+  const [cursor, setCursor] = useState(today);
+
   //crea un dizionario raggruppando le entries in base al giorno
   const entriesByDay = entries.reduce<Record<string, TimeEntry[]>>(
     (acc, entry) => {
@@ -66,8 +63,10 @@ export default function Calendar({ entries, settings, view }: CalendarProps) {
   }
 
   function handleDayClick(key: string) {
+    // setSelectedDay(key);
     console.log("Giorno selezionato:", key);
   }
+
   //funzione di creazione della casella
   function renderCell(date: Date) {
     const key = dateToKey(date);
@@ -171,7 +170,7 @@ export default function Calendar({ entries, settings, view }: CalendarProps) {
   ];
   while (monthCells.length % 7 !== 0) monthCells.push(null);
 
-  // --- Dati per vista settimanale ---
+  // ---- Dati per vista settimanale ----
   const weekStart = getWeekStart(cursor);
   const weekDays = Array.from({ length: 7 }, (_, i) => {
     const d = new Date(weekStart);

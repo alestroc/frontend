@@ -22,6 +22,6 @@ export interface TimeEntry {
   nomecommessa: string;
   idarticolo: string;
   nomearticolo: string;
-  ore: number;
+  ore: string;
   nota: string;
 }
