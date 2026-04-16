@@ -4,7 +4,11 @@ import { useEffect, useState } from "react";
 import Calendar from "./components/calendar/Calendar";
 import Sidebar from "./components/Sidebar";
 import type { AppSettings, TimeEntry } from "./types";
-import { checkIsLogged, deleteLocalStorageData } from "./functions/functions";
+import {
+  checkIsLogged,
+  deleteLocalStorageData,
+  dateToKey,
+} from "./functions/functions";
 import { getEntries } from "./functions/entries";
 import { getSettings } from "./functions/settings";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
@@ -15,14 +19,15 @@ import Modal from "./components/Modal";
 function App() {
   const [isLogged, setIsLogged] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [selected, setSelected] = useState("Mensile");
+  const [view, setView] = useState("Mensile");
   const [settings, setSettings] = useState<AppSettings | null>(null);
   const [entries, setEntries] = useState<TimeEntry[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isModalActive, setIsModalActive] = useState(false);
+  const [selectedDay, setSelectedDay] = useState<string | null>(null);
 
   const sideBarButton = [
-    "Aggiungi attività - WIP",
+    "Aggiungi attività",
     "Mensile",
     "Settimanale",
     "Giornata",
@@ -75,24 +80,21 @@ function App() {
       buttonValue === "Settimanale" ||
       buttonValue === "Giornata"
     ) {
-      setSelected(buttonValue);
+      setView(buttonValue);
     }
 
     switch (buttonValue) {
-      case "Aggiungi attività - WIP":
+      case "Aggiungi attività":
+        setSelectedDay(dateToKey(new Date()));
         setIsModalActive(true);
-        console.log(isModalActive);
         break;
       case "Scarica Report - WIP":
-        console.log("Bottone Cliccato");
+        console.log("Bottone Cliccato Scarica Report Premuto");
         break;
       case "Logout":
         deleteLocalStorageData();
         setIsLogged(false);
         break;
-
-      default:
-      // console.log("handlesidebar");
     }
   }
 
@@ -109,7 +111,7 @@ function App() {
               entries={entries}
               settings={settings}
               isModalActive={setIsModalActive}
-              selectedDay={setSelected}
+              selectedDay={selectedDay}
             />
           )}
           <Sidebar setIsLogged={setIsLogged}>
@@ -117,12 +119,13 @@ function App() {
               {sideBarButton.map((element) => {
                 return (
                   <button
+                    key={element}
                     className={[
                       sideBarStyle.button.default,
                       element == sideBarButton[0]
                         ? sideBarStyle.button.addAttivita
                         : "",
-                      selected === element ? "bg-blue-500" : "",
+                      view === element ? "bg-blue-500" : "",
                     ].join(" ")}
                     onClick={(event) => {
                       handleSidebar(event);
@@ -143,7 +146,15 @@ function App() {
               })}
             </div>
           </Sidebar>
-          <Calendar entries={entries} settings={settings} view={selected} />
+          <Calendar
+            entries={entries}
+            settings={settings}
+            view={view}
+            handleClickDay={(e) => {
+              setSelectedDay(e);
+              setIsModalActive(true);
+            }}
+          />
         </div>
       )}
       {error && (

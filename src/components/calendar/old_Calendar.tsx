@@ -3,33 +3,35 @@ import type { AppSettings, TimeEntry } from "../../types";
 import EntryBadge from "./EntryBadge";
 import { dateToKey, getWeekStart } from "../../functions/functions";
 import MonthView from "./MonthView";
-import WeekView from "./WeekView";
-import DayView from "./DayView";
-import { DAYS_OF_WEEK, MONTHS } from "../../functions/config";
 
 interface CalendarProps {
   entries: TimeEntry[];
   settings: AppSettings | null;
   view: string;
-  selected?: string | null;
-  isModal?: boolean;
-  handleClickDay?: (key: string) => void;
+  selected?: Date | null;
 }
 
-// CHE CI FACCIAMO COL GIORNO CLICCATO? LO EVIDENZIAMO QUANDO SIAMO DENTRO IL MODALE E GLI ASSEGNAMO IL VALORE
-// DELLO STATO CHE ANDRA AL MODALE PER MOSTRARE A L'UTENTE CHE GIORNO E' ATTUALMENTE SELEZIONATO/VISUALIZZATO
+const DAYS_OF_WEEK = ["Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"];
+const MONTHS = [
+  "Gennaio",
+  "Febbraio",
+  "Marzo",
+  "Aprile",
+  "Maggio",
+  "Giugno",
+  "Luglio",
+  "Agosto",
+  "Settembre",
+  "Ottobre",
+  "Novembre",
+  "Dicembre",
+];
 
-// DOVE STO SALVANDO O GESTENDO QUESTO GIORNO SELEZIONATO?
-// DA NESSUNA PARTE. DEVO CREARE UNO STATO DENTRO MODALE. IN APP NON MI SERVE PERCHE' GLI PASSO IL GIORNO TRAMITE
-// LA FUNZIONE ONCLICK APRE IL MODALE E ASSEGNA ALLO STATO IL GIORNO CHE VERRA PASSATO AL MODALE
-
-export default function Calendar({
+export default function OldCalendar({
   entries,
   settings,
   view,
-  isModal = false,
-  handleClickDay,
-  selected = null,
+  // selected = new Date(),
 }: CalendarProps) {
   const today = new Date();
   const [cursor, setCursor] = useState(today);
@@ -43,6 +45,7 @@ export default function Calendar({
     },
     {},
   );
+
   const daysBefore = new Date(today);
   daysBefore.setDate(today.getDate() - (settings?.daysBefore ?? 0));
 
@@ -60,13 +63,17 @@ export default function Calendar({
     );
   }
 
+  function handleDayClick(key: string) {
+    // setSelectedDay(key);
+    console.log("Giorno selezionato:", key);
+  }
+
   //funzione di creazione della casella
   function renderCell(date: Date) {
     const key = dateToKey(date);
     const dayEntries = entriesByDay[key] ?? [];
     const isToday = key === todayKey;
     const disabled = isDisabled(date);
-    const isSelected = key === selected;
     const totalHours = dayEntries.reduce(
       (sum, element) => sum + Number(element.ore),
       0,
@@ -75,7 +82,7 @@ export default function Calendar({
     return (
       <div
         key={key}
-        onClick={() => !disabled && handleClickDay?.(key)}
+        onClick={() => !disabled && handleDayClick(key)}
         style={{ display: "grid", gridTemplateRows: "auto 1fr auto" }}
         className={[
           "p-1 border transition overflow-hidden ",
@@ -85,7 +92,6 @@ export default function Calendar({
           isToday
             ? "bg-[#4868a0] hover:bg-[#3d5989]"
             : "border-gray-200 dark:border-gray-700",
-          isSelected ? "bg-red-500" : "",
         ].join(" ")}
       >
         <div
@@ -96,24 +102,20 @@ export default function Calendar({
         >
           {date.getDate()}
         </div>
-        {!isModal && (
-          <>
-            <div className="flex flex-col overflow-auto">
-              {dayEntries.map((entry, i) => (
-                <EntryBadge key={i} entry={entry} view={view} />
-              ))}
-            </div>
-            {totalHours !== 0 && (
-              <div
-                className={[
-                  "border-t text-center border-gray-200 dark:border-gray-600 text-xs font-semibold text-black dark:text-gray-300",
-                  totalHours === 8 ? "bg-green-500" : "bg-red-500",
-                ].join(" ")}
-              >
-                {totalHours}h
-              </div>
-            )}
-          </>
+        <div className="flex flex-col overflow-auto">
+          {dayEntries.map((entry, i) => (
+            <EntryBadge key={i} entry={entry} view={view} />
+          ))}
+        </div>
+        {totalHours !== 0 && (
+          <div
+            className={[
+              "border-t text-center border-gray-200 dark:border-gray-600 text-xs font-semibold text-black dark:text-gray-300",
+              totalHours === 8 ? "bg-green-500" : "bg-red-500",
+            ].join(" ")}
+          >
+            {totalHours}h
+          </div>
         )}
       </div>
     );
@@ -156,6 +158,16 @@ export default function Calendar({
     return `${MONTHS[cursor.getMonth()]} ${cursor.getFullYear()}`;
   }
 
+  // --- Dati per vista mensile ---
+
+  // ---- Dati per vista settimanale ----
+  const weekStart = getWeekStart(cursor);
+  const weekDays = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(weekStart);
+    d.setDate(weekStart.getDate() + i);
+    return d;
+  });
+
   return (
     <div className="flex flex-col w-full h-full select-none p-2">
       {/* Header navigazione */}
@@ -182,6 +194,7 @@ export default function Calendar({
           Oggi
         </button>
       </div>
+
       {/* Vista mensile */}
       {view === "Mensile" && (
         <MonthView cursor={cursor} renderCell={renderCell} />
@@ -189,12 +202,25 @@ export default function Calendar({
 
       {/* Vista settimanale */}
       {view === "Settimanale" && (
-        <WeekView cursor={cursor} renderCell={renderCell} />
+        <div
+          className="flex-1 max-h-[50%] grid grid-cols-7 min-h-0"
+          style={{ gridTemplateRows: "auto 1fr" }}
+        >
+          {weekDays.map((d) => (
+            <div
+              key={dateToKey(d)}
+              className="text-center text-xs font-semibold text-white py-1"
+            >
+              {DAYS_OF_WEEK[(d.getDay() + 6) % 7]} {d.getDate()}
+            </div>
+          ))}
+          {weekDays.map((d) => renderCell(d))}
+        </div>
       )}
 
       {/* Vista giornaliera */}
       {view === "Giornata" && (
-        <DayView cursor={cursor} renderCell={renderCell} />
+        <div className="flex-1 min-h-0">{renderCell(cursor)}</div>
       )}
     </div>
   );
