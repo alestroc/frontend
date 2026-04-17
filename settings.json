@@ -1,5 +1,8 @@
-{
+
   "tailwindCSS.experimental.configFile": {
-    "frontend/src/index.css": "frontend/**"
-  }
-}
+    "frontend/src/index.css": "frontend/**"}
+  "files.exclude": {
+  "**/node_modules": true,
+  "**/.venv": true,
+  "**/dist": true}
+

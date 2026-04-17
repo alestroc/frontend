@@ -1,5 +1,5 @@
 import { BASE_URL } from "./config";
-import type { LocalData } from "../types";
+import type { LocalData, TimeEntry } from "../types";
 
 export type { LocalData };
 
@@ -22,7 +22,6 @@ export function deleteLocalStorageData(): void {
 
 // Controlla se l'utente è loggato verificando il token sul server
 export async function checkIsLogged(): Promise<boolean> {
-  
   const localData = checkLocalStorageData();
   if (!localData) return false;
 
@@ -51,6 +50,15 @@ export async function checkIsLogged(): Promise<boolean> {
 //passato un giorno, ritorna una stringa YYYY-MM-DD
 export function dateToKey(date: Date): string {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+}
+//crea un dizionario raggruppando le entries in base al giorno
+
+export function groupEntries(entries: TimeEntry[]) {
+  entries.reduce<Record<string, TimeEntry[]>>((acc, entry) => {
+    if (!acc[entry.giorno]) acc[entry.giorno] = [];
+    acc[entry.giorno].push(entry);
+    return acc;
+  }, {});
 }
 
 // trova il lunedì della settimana di cui viene passato il giorno

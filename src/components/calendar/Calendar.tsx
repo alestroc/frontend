@@ -1,7 +1,11 @@
 import { useState } from "react";
 import type { AppSettings, TimeEntry } from "../../types";
 import EntryBadge from "./EntryBadge";
-import { dateToKey, getWeekStart } from "../../functions/functions";
+import {
+  dateToKey,
+  getWeekStart,
+  groupEntries,
+} from "../../functions/functions";
 import MonthView from "./MonthView";
 import WeekView from "./WeekView";
 import DayView from "./DayView";
@@ -40,7 +44,6 @@ export default function Calendar({
     return today;
   });
 
-  //crea un dizionario raggruppando le entries in base al giorno
   const entriesByDay = entries.reduce<Record<string, TimeEntry[]>>(
     (acc, entry) => {
       if (!acc[entry.giorno]) acc[entry.giorno] = [];

@@ -27,7 +27,7 @@ function App() {
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
 
   const sideBarButton = [
-    "Aggiungi attività",
+    "Registra Oggi",
     "Mensile",
     "Settimanale",
     "Giornata",
@@ -84,7 +84,7 @@ function App() {
     }
 
     switch (buttonValue) {
-      case "Aggiungi attività":
+      case "Registra Oggi":
         setSelectedDay(dateToKey(new Date()));
         setIsModalActive(true);
         break;
