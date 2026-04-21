@@ -160,7 +160,7 @@ function App() {
                   ].join(" ")}
                   onClick={() => handleSidebar(label)}
                 >
-                  <Icon className={sideBarStyle.icon} />
+                  <Icon className={!collapsed ? sideBarStyle.icon : ""} />
                   {!collapsed && label}
                 </button>
               ))}

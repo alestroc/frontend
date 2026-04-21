@@ -133,7 +133,8 @@ function Modal({
       <div className="flex flex-col justify-between z-99 absolute w-[80%] h-[80%] self-center mx-[10%] bg-slate-400 overflow-auto">
         <h2>Registra Nuova Attività</h2>
         <h4 className="sticky botttom-0">
-          Giorno selezionato: {selectedDay ?? "nessuno"}
+          Giorno selezionato:{" "}
+          {selectedDay?.split("-").reverse().join("-") ?? "nessuno"}
         </h4>
         <div className="flex justify-between h-60">
           <div className="flex-1 border">
@@ -192,7 +193,7 @@ function Modal({
             }}
           />
         </div>
-        <div className="flex gap-3 self-center p-3">
+        <div className="sticky flex bg-slate-400 justify-end w-full bottom-0 p-2 gap-3">
           <button
             onClick={handleConferma}
             disabled={isSaving}
