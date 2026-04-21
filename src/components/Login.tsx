@@ -11,7 +11,7 @@ export default function LoginPage({
   const [password, setPassword] = useState("Studium2026!");
   const [error, setError] = useState("");
 
-  async function handleSubmit(e: SubmitEvent) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!email || !password) {
       setError("Inserisci email e password.");

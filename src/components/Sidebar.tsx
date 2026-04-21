@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import logo from "../assets/logo.svg";
 import { deleteLocalStorageData } from "../functions/functions";
 import LogoutIcon from "@mui/icons-material/Logout";
@@ -6,11 +6,16 @@ import LogoutIcon from "@mui/icons-material/Logout";
 interface SidebarProps {
   children?: React.ReactNode;
   setIsLogged: React.Dispatch<React.SetStateAction<boolean>>;
+  collapsed: boolean;
+  setCollapsed: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export default function Sidebar({ children, setIsLogged }: SidebarProps) {
-  const [collapsed, setCollapsed] = useState(false);
-
+export default function Sidebar({
+  children,
+  setIsLogged,
+  collapsed,
+  setCollapsed,
+}: SidebarProps) {
   function Logout() {
     deleteLocalStorageData();
     setIsLogged(false);
@@ -24,7 +29,7 @@ export default function Sidebar({ children, setIsLogged }: SidebarProps) {
       ].join(" ")}
     >
       {/* Header Sidebar */}
-      <div className="flex border-b justify-between border-gray-200">
+      <div className="flex border-b justify-between border-gray-200 ">
         {collapsed ? (
           ""
         ) : (
@@ -43,7 +48,7 @@ export default function Sidebar({ children, setIsLogged }: SidebarProps) {
         )}
 
         <button
-          onClick={() => setCollapsed((c) => !c)}
+          onClick={() => setCollapsed((prev) => !prev)}
           className="flex items-center justify-center h-8 w-10 rounded-md self-center dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors shrink-0"
           title={collapsed ? "Espandi" : "Comprimi"}
         >
@@ -54,7 +59,7 @@ export default function Sidebar({ children, setIsLogged }: SidebarProps) {
       </div>
       {/* Contenuto */}
       <div className="flex-1 overflow-hidden text-white font-bold">
-        {!collapsed && children}
+        {children}
       </div>
       {!collapsed ? (
         <button

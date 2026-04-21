@@ -25,3 +25,14 @@ export interface TimeEntry {
   ore: string;
   nota: string;
 }
+
+export interface Commessa {
+  id: string;
+  name: string;
+  hidearticle?: string;
+}
+
+export interface Articolo {
+  id: string;
+  name: string;
+}

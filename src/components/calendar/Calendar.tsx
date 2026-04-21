@@ -1,15 +1,12 @@
 import { useState } from "react";
 import type { AppSettings, TimeEntry } from "../../types";
-import EntryBadge from "./EntryBadge";
-import {
-  dateToKey,
-  getWeekStart,
-  groupEntries,
-} from "../../functions/functions";
+import { dateToKey, getWeekStart } from "../../functions/functions";
+import { DAYS_OF_WEEK, MONTHS } from "../../functions/config";
 import MonthView from "./MonthView";
 import WeekView from "./WeekView";
 import DayView from "./DayView";
-import { DAYS_OF_WEEK, MONTHS } from "../../functions/config";
+import CalendarCell from "./CalendarCell";
+import CalendarNav from "./CalendarNav";
 
 interface CalendarProps {
   entries: TimeEntry[];
@@ -19,13 +16,6 @@ interface CalendarProps {
   isModal?: boolean;
   handleClickDay?: (key: string) => void;
 }
-
-// CHE CI FACCIAMO COL GIORNO CLICCATO? LO EVIDENZIAMO QUANDO SIAMO DENTRO IL MODALE E GLI ASSEGNAMO IL VALORE
-// DELLO STATO CHE ANDRA AL MODALE PER MOSTRARE A L'UTENTE CHE GIORNO E' ATTUALMENTE SELEZIONATO/VISUALIZZATO
-
-// DOVE STO SALVANDO O GESTENDO QUESTO GIORNO SELEZIONATO?
-// DA NESSUNA PARTE. DEVO CREARE UNO STATO DENTRO MODALE. IN APP NON MI SERVE PERCHE' GLI PASSO IL GIORNO TRAMITE
-// LA FUNZIONE ONCLICK APRE IL MODALE E ASSEGNA ALLO STATO IL GIORNO CHE VERRA PASSATO AL MODALE
 
 export default function Calendar({
   entries,
@@ -54,7 +44,7 @@ export default function Calendar({
   );
 
   const daysBefore = new Date(today);
-  daysBefore.setDate(today.getDate() - (settings?.daysBefore ?? 0));
+  daysBefore.setDate(today.getDate() - (settings?.daysBefore ?? 120));
 
   const todayKey = dateToKey(today);
   const daysBeforeKey = dateToKey(daysBefore);
@@ -70,66 +60,23 @@ export default function Calendar({
     );
   }
 
-  //funzione di creazione della casella
   function renderCell(date: Date) {
     const key = dateToKey(date);
-    const dayEntries = entriesByDay[key] ?? [];
-    const isToday = key === todayKey;
-    const disabled = isDisabled(date);
-    const isSelected = key === selected;
-    const totalHours = dayEntries.reduce(
-      (sum, element) => sum + Number(element.ore),
-      0,
-    );
-
     return (
-      <div
+      <CalendarCell
         key={key}
-        onClick={() => !disabled && handleClickDay?.(key)}
-        style={{ display: "grid", gridTemplateRows: "auto 1fr auto" }}
-        className={[
-          "p-1 border transition overflow-hidden ",
-          disabled
-            ? "opacity-40 cursor-not-allowed"
-            : "cursor-pointer hover:border-orange-500",
-          isToday
-            ? "bg-[#4868a0] hover:bg-[#3d5989]"
-            : "border-gray-200 dark:border-gray-700",
-          isSelected ? "bg-red-500" : "",
-        ].join(" ")}
-      >
-        <div
-          className={[
-            "text-xs font-semibold mb-1",
-            isToday ? "text-black" : "text-white",
-          ].join(" ")}
-        >
-          {date.getDate()}
-        </div>
-        {!isModal && (
-          <>
-            <div className="flex flex-col overflow-auto">
-              {dayEntries.map((entry, i) => (
-                <EntryBadge key={i} entry={entry} view={view} />
-              ))}
-            </div>
-            {totalHours !== 0 && (
-              <div
-                className={[
-                  "border-t text-center border-gray-200 dark:border-gray-600 text-xs font-semibold text-black dark:text-gray-300",
-                  totalHours === 8 ? "bg-green-500" : "bg-red-500",
-                ].join(" ")}
-              >
-                {totalHours}h
-              </div>
-            )}
-          </>
-        )}
-      </div>
+        date={date}
+        entries={entriesByDay[key] ?? []}
+        isToday={key === todayKey}
+        isSelected={key === selected}
+        disabled={isDisabled(date)}
+        isModal={isModal}
+        view={view}
+        onClick={() => handleClickDay?.(key)}
+      />
     );
   }
 
-  // --- Navigazione ---
   function prev() {
     setCursor((d) => {
       const n = new Date(d);
@@ -168,41 +115,18 @@ export default function Calendar({
 
   return (
     <div className="flex flex-col w-full h-full select-none p-2">
-      {/* Header navigazione */}
-      <div className="shrink-0 flex items-center gap-2 mb-2">
-        <button
-          onClick={prev}
-          className="px-3 py-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 text-lg"
-        >
-          ‹
-        </button>
-        <span className="font-semibold text-lg text-center w-72">
-          {navLabel()}
-        </span>
-        <button
-          onClick={next}
-          className="px-3 py-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 text-lg"
-        >
-          ›
-        </button>
-        <button
-          onClick={() => setCursor(new Date(today))}
-          className="px-3 py-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 text-sm"
-        >
-          Oggi
-        </button>
-      </div>
-      {/* Vista mensile */}
+      <CalendarNav
+        label={navLabel()}
+        onPrev={prev}
+        onNext={next}
+        onToday={() => setCursor(new Date(today))}
+      />
       {view === "Mensile" && (
         <MonthView cursor={cursor} renderCell={renderCell} />
       )}
-
-      {/* Vista settimanale */}
       {view === "Settimanale" && (
         <WeekView cursor={cursor} renderCell={renderCell} />
       )}
-
-      {/* Vista giornaliera */}
       {view === "Giornata" && (
         <DayView cursor={cursor} renderCell={renderCell} />
       )}

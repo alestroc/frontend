@@ -14,7 +14,12 @@ import { getSettings } from "./functions/settings";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import CalendarViewWeekIcon from "@mui/icons-material/CalendarViewWeek";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
-import Modal from "./components/Modal";
+import DownloadIcon from "@mui/icons-material/Download";
+import AssessmentIcon from "@mui/icons-material/Assessment";
+import AddTaskIcon from "@mui/icons-material/AddTask";
+import type { SvgIconComponent } from "@mui/icons-material";
+import Modal from "./components/modal/Modal";
+import { useNeededs } from "./hooks/useNeededs";
 
 function App() {
   const [isLogged, setIsLogged] = useState(false);
@@ -25,14 +30,19 @@ function App() {
   const [error, setError] = useState<string | null>(null);
   const [isModalActive, setIsModalActive] = useState(false);
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
+  const [collapsed, setCollapsed] = useState(false);
 
-  const sideBarButton = [
-    "Registra Oggi",
-    "Mensile",
-    "Settimanale",
-    "Giornata",
-    "Statistiche - WIP",
-    "Scarica Report - WIP",
+  const { commesse, articoli, error: neededsError } = useNeededs();
+
+  type SidebarItem = { label: string; Icon: SvgIconComponent };
+
+  const sideBarItems: SidebarItem[] = [
+    { label: "Registra Oggi", Icon: AddTaskIcon },
+    { label: "Mensile", Icon: CalendarMonthIcon },
+    { label: "Settimanale", Icon: CalendarViewWeekIcon },
+    { label: "Giornata", Icon: CalendarTodayIcon },
+    { label: "Statistiche", Icon: AssessmentIcon },
+    { label: "Scarica Report", Icon: DownloadIcon },
   ];
 
   useEffect(() => {
@@ -69,12 +79,16 @@ function App() {
     loadData();
   }, [isLogged]);
 
-  function handleSidebar(e) {
-    if (!e) {
-      return false;
+  async function reloadEntries() {
+    try {
+      const apiEntries = await getEntries();
+      setEntries(apiEntries);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Errore imprevisto.");
     }
-    //Selezione del filtro sul calendario
-    const buttonValue = e.currentTarget.textContent;
+  }
+
+  function handleSidebar(buttonValue: string) {
     if (
       buttonValue === "Mensile" ||
       buttonValue === "Settimanale" ||
@@ -88,8 +102,11 @@ function App() {
         setSelectedDay(dateToKey(new Date()));
         setIsModalActive(true);
         break;
-      case "Scarica Report - WIP":
-        console.log("Bottone Cliccato Scarica Report Premuto");
+      case "Scarica Report":
+        console.log("Bottone Scarica Report Premuto");
+        break;
+      case "Statistiche":
+        console.log("Bottone Statistiche premuto.");
         break;
       case "Logout":
         deleteLocalStorageData();
@@ -112,38 +129,41 @@ function App() {
               settings={settings}
               isModalActive={setIsModalActive}
               selectedDay={selectedDay}
+              onSaved={reloadEntries}
+              commesse={commesse}
+              articoli={articoli}
+              neededsError={neededsError}
             />
           )}
-          <Sidebar setIsLogged={setIsLogged}>
-            <div className="flex flex-col p-2 gap-5 justify-start mt-5">
-              {sideBarButton.map((element) => {
-                return (
-                  <button
-                    key={element}
-                    className={[
-                      sideBarStyle.button.default,
-                      element == sideBarButton[0]
-                        ? sideBarStyle.button.addAttivita
-                        : "",
-                      view === element ? "bg-blue-500" : "",
-                    ].join(" ")}
-                    onClick={(event) => {
-                      handleSidebar(event);
-                    }}
-                  >
-                    {element === "Mensile" ? (
-                      <CalendarMonthIcon className={sideBarStyle.icon} />
-                    ) : element === "Settimanale" ? (
-                      <CalendarViewWeekIcon className={sideBarStyle.icon} />
-                    ) : element === "Giornata" ? (
-                      <CalendarTodayIcon className={sideBarStyle.icon} />
-                    ) : (
-                      ""
-                    )}
-                    {element}
-                  </button>
-                );
-              })}
+          <Sidebar
+            setIsLogged={setIsLogged}
+            collapsed={collapsed}
+            setCollapsed={setCollapsed}
+          >
+            <div
+              className={[
+                "flex flex-col gap-5 justify-between mt-5",
+                collapsed ? "p-1 items-center" : "p-2",
+              ].join(" ")}
+            >
+              {sideBarItems.map(({ label, Icon }) => (
+                <button
+                  key={label}
+                  title={label}
+                  className={[
+                    sideBarStyle.button.default,
+                    label === sideBarItems[0].label
+                      ? sideBarStyle.button.addAttivita
+                      : "",
+                    view === label ? "bg-blue-500" : "",
+                    collapsed ? "flex items-center justify-center" : "",
+                  ].join(" ")}
+                  onClick={() => handleSidebar(label)}
+                >
+                  <Icon className={sideBarStyle.icon} />
+                  {!collapsed && label}
+                </button>
+              ))}
             </div>
           </Sidebar>
           <Calendar
@@ -176,8 +196,8 @@ export default App;
 
 const sideBarStyle = {
   button: {
-    default: "border-l rounded-md p-2 w-full hover:cursor-pointer",
+    default: "border-l flex rounded-md p-2 w-full hover:cursor-pointer",
     addAttivita: " bg-blue-500 ",
   },
-  icon: "relative mr-2",
+  icon: "mr-2",
 };
