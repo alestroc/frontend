@@ -132,7 +132,7 @@ function App() {
               onSaved={reloadEntries}
               commesse={commesse}
               articoli={articoli}
-              neededsError={neededsError}
+              // neededsError={neededsError}
             />
           )}
           <Sidebar

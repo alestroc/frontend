@@ -143,9 +143,9 @@ function Modal({
         <h2 className="px-6 pt-5 text-xl font-semibold text-red-500">
           Registra Nuova Attività
         </h2>
-        <h4 className="sticky botttom-0 px-6 pb-4 text-sm font-medium text-slate-600">
+        <h4 className="sticky botttom-0 px-6 pb-4 text-sm font-medium text-white">
           Giorno selezionato:{" "}
-          <span className="text-slate-900 font-semibold">
+          <span className="text-white font-semibold">
             {selectedDay?.split("-").reverse().join("-") ?? "nessuno"}
           </span>
         </h4>
@@ -165,7 +165,7 @@ function Modal({
           </div>
         </div>
         <div className="border-t border-slate-200 flex flex-col gap-3 px-4 py-4 mt-4">
-          <div className="flex gap-2 text-xs font-semibold uppercase tracking-wide text-slate-600">
+          <div className="flex gap-2 text-xs font-semibold uppercase tracking-wide text-white">
             <div className="flex-5">Commessa</div>
             <div className="flex-2">Articolo</div>
             <div className="flex-1">Ore</div>
