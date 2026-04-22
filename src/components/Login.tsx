@@ -78,7 +78,7 @@ export default function LoginPage({
 
           <button
             type="submit"
-            className="mt-4 w-full py-2.5 text-sm font-bold text-white rounded-full bg-green-500 hover:bg-orange-600 transition"
+            className="mt-4 w-full py-2.5 text-sm font-bold text-white rounded-full bg-orange-600 hover:bg-orange-800 transition"
           >
             Accedi
           </button>

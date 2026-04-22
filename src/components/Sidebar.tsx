@@ -24,19 +24,19 @@ export default function Sidebar({
   return (
     <div
       className={[
-        "flex flex-col h-full border-r bg-black border-black-200 transition-all duration-300",
+        "flex flex-col h-full border-r bg-slate-900 border-slate-700 transition-all duration-300",
         collapsed ? "w-12" : "w-56",
       ].join(" ")}
     >
       {/* Header Sidebar */}
-      <div className="flex border-b justify-between border-gray-200 ">
+      <div className="flex border-b border-slate-700 justify-between">
         {collapsed ? (
           ""
         ) : (
           <div className="flex items-center gap-3 px-2 py-2">
             <img src={logo} alt="Studium logo" className="h-7 w-auto" />
             <span
-              className="text-white text-xl font-light uppercase"
+              className="text-slate-100 text-xl font-light uppercase tracking-widest"
               style={{
                 fontFamily:
                   "'Futura', 'Century Gothic', 'Nunito Sans', sans-serif",
@@ -49,21 +49,19 @@ export default function Sidebar({
 
         <button
           onClick={() => setCollapsed((prev) => !prev)}
-          className="flex items-center justify-center h-8 w-10 rounded-md self-center dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors shrink-0"
+          className="flex items-center justify-center h-8 w-10 rounded-md self-center text-slate-300 hover:bg-slate-800 hover:text-slate-100 transition-colors shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
           title={collapsed ? "Espandi" : "Comprimi"}
         >
-          <span className="text-black-500 dark:text-gray-400 text-lg leading-none">
-            {collapsed ? "›" : "‹"}
-          </span>
+          <span className="text-lg leading-none">{collapsed ? "›" : "‹"}</span>
         </button>
       </div>
       {/* Contenuto */}
-      <div className="flex-1 overflow-hidden text-white font-bold">
+      <div className="flex-1 overflow-hidden text-slate-100 font-medium">
         {children}
       </div>
       {!collapsed ? (
         <button
-          className=" border-red-500 p-2 w-full bg-red-500 hover:cursor-pointer"
+          className="p-2 w-full bg-red-600 text-white font-medium hover:bg-red-700 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
           onClick={Logout}
         >
           Logout
@@ -71,7 +69,7 @@ export default function Sidebar({
       ) : (
         <div
           title="Logout"
-          className="flex items-center justify-center h-8 w-full  bg-red-700 hover:bg-red-800"
+          className="flex items-center justify-center h-8 w-full bg-red-600 text-white hover:bg-red-700 transition-colors cursor-pointer"
         >
           <LogoutIcon onClick={Logout} />
         </div>

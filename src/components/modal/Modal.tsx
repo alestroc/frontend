@@ -1,4 +1,4 @@
-import type { AppSettings, TimeEntry } from "../../types";
+import type { AppSettings, Articolo, Commessa, TimeEntry } from "../../types";
 import Calendar from "../calendar/Calendar";
 import ConfirmDialog from "./ConfirmDialog";
 import EntryList from "./EntryList";
@@ -6,9 +6,8 @@ import EntryRowEditor, {
   type EntryRow,
   createEmptyRow,
 } from "./EntryRowEditor";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { addTimeEntries } from "../../functions/entries";
-import { useNeededs } from "../../hooks/useNeededs";
 
 interface ModalProp {
   entries: TimeEntry[];
@@ -16,6 +15,9 @@ interface ModalProp {
   isModalActive: React.Dispatch<React.SetStateAction<boolean>>;
   selectedDay?: string | null;
   onSaved?: () => void;
+  commesse: Commessa[];
+  articoli: Articolo[];
+  neededsError?: string | null;
 }
 
 function Modal({
@@ -24,14 +26,15 @@ function Modal({
   isModalActive,
   selectedDay: initialDay = null,
   onSaved,
+  commesse,
+  articoli,
+  neededsError = null,
 }: ModalProp) {
   const [selectedDay, setSelectedDay] = useState<string | null>(initialDay);
   const [rows, setRows] = useState<EntryRow[]>([createEmptyRow()]);
   const [isSaving, setIsSaving] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [showConfirm, setShowConfirm] = useState(false);
-
-  const { commesse, articoli, error: neededsError } = useNeededs();
 
   const entriesByDay = entries.reduce<Record<string, TimeEntry[]>>(
     (acc, entry) => {
@@ -50,8 +53,14 @@ function Modal({
   );
   const maxHours = settings?.maxHours ?? 8;
 
-  const commesseOptions = commesse.map((c) => ({ id: c.id, label: c.name }));
-  const articoliOptions = articoli.map((a) => ({ id: a.id, label: a.name }));
+  const commesseOptions = useMemo(
+    () => commesse.map((c) => ({ id: c.id, label: c.name })),
+    [commesse],
+  );
+  const articoliOptions = useMemo(
+    () => articoli.map((a) => ({ id: a.id, label: a.name })),
+    [articoli],
+  );
   const hoursConfig = {
     min: settings?.minHours ?? 0,
     max: maxHours,
@@ -130,14 +139,18 @@ function Modal({
 
   return (
     <>
-      <div className="flex flex-col justify-between z-99 absolute w-[80%] h-[80%] self-center mx-[10%] bg-slate-400 overflow-auto">
-        <h2>Registra Nuova Attività</h2>
-        <h4 className="sticky botttom-0">
+      <div className="flex flex-col justify-between z-99 absolute w-[80%] h-[80%] self-center mx-[10%] bg-slate-700 rounded-lg shadow-2xl overflow-auto">
+        <h2 className="px-6 pt-5 text-xl font-semibold text-red-500">
+          Registra Nuova Attività
+        </h2>
+        <h4 className="sticky botttom-0 px-6 pb-4 text-sm font-medium text-slate-600">
           Giorno selezionato:{" "}
-          {selectedDay?.split("-").reverse().join("-") ?? "nessuno"}
+          <span className="text-slate-900 font-semibold">
+            {selectedDay?.split("-").reverse().join("-") ?? "nessuno"}
+          </span>
         </h4>
-        <div className="flex justify-between h-60">
-          <div className="flex-1 border">
+        <div className="flex justify-between gap-3 h-60 px-4">
+          <div className="flex-1 rounded-md border border-slate-200 bg-slate-900 overflow-hidden">
             <Calendar
               entries={entries}
               settings={settings}
@@ -147,10 +160,12 @@ function Modal({
               handleClickDay={(key) => setSelectedDay(key)}
             />
           </div>
-          <div className="flex-1 border">SLAVATAGGIO PREFERITI/PRESET</div>
+          <div className="flex-1 rounded-md border border-slate-200 bg-slate-50 p-3 text-sm text-slate-500">
+            SLAVATAGGIO PREFERITI/PRESET
+          </div>
         </div>
-        <div className="border flex flex-col gap-2 p-3">
-          <div className="flex gap-2 text-sm font-semibold text-black">
+        <div className="border-t border-slate-200 flex flex-col gap-3 px-4 py-4 mt-4">
+          <div className="flex gap-2 text-xs font-semibold uppercase tracking-wide text-slate-600">
             <div className="flex-5">Commessa</div>
             <div className="flex-2">Articolo</div>
             <div className="flex-1">Ore</div>
@@ -173,18 +188,18 @@ function Modal({
           <button
             type="button"
             onClick={addRow}
-            className="self-start px-3 py-1 rounded-md border font-bold border-black text-sm text-black hover:bg-gray-200"
+            className="self-start px-3 py-1.5 rounded-md border border-slate-300 bg-slate-500 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
           >
             +
           </button>
 
           {(formError || neededsError) && (
-            <p className="text-sm text-red-700 font-semibold">
+            <p className="text-sm font-medium text-red-700 bg-red-50 border border-red-200 rounded-md px-3 py-2">
               {formError ?? neededsError}
             </p>
           )}
         </div>
-        <div className="border flex flex-col gap-1 p-2">
+        <div className="border-t border-slate-200 flex flex-col gap-2 px-4 py-4 bg-slate-400">
           <EntryList
             entries={existingEntries}
             onDelete={(entry) => {
@@ -193,18 +208,18 @@ function Modal({
             }}
           />
         </div>
-        <div className="sticky flex bg-slate-400 justify-end w-full bottom-0 p-2 gap-3">
+        <div className="sticky bottom-0 flex bg-slate-600 border-t border-slate-200 justify-end w-full p-3 gap-2">
           <button
             onClick={handleConferma}
             disabled={isSaving}
-            className="px-4 py-2 rounded-md bg-blue-500 text-white font-semibold hover:bg-blue-600 disabled:opacity-50"
+            className="px-4 py-2 rounded-md bg-blue-600 text-white font-medium hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             Conferma
           </button>
           <button
             onClick={() => isModalActive(false)}
             disabled={isSaving}
-            className="px-4 py-2 rounded-md border border-gray-600 text-black hover:bg-gray-200 disabled:opacity-50"
+            className="px-4 py-2 rounded-md border border-slate-300 bg-white text-slate-700 font-medium hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:opacity-50 transition-colors"
           >
             Annulla
           </button>

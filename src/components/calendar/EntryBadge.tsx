@@ -27,8 +27,9 @@ export default function EntryBadge({ entry, view }: EntryBadgeProp) {
   );
 }
 const Styles = {
-  default: "bg-blue-200 rounded text-black mb-1 px-1 truncate ",
-  month: "text-xs min-h-4 font-semibold ",
-  week: " text-sm min-h-6 max-h-10  font-semibold",
-  day: "text-md rounded  bg-blue-200 font-semibold",
+  default:
+    "bg-blue-100 text-blue-900 border border-blue-200 rounded mb-1 px-1.5 truncate ",
+  month: "text-xs min-h-4 font-medium ",
+  week: "text-sm min-h-6 max-h-10 font-medium",
+  day: "text-md rounded font-medium",
 };

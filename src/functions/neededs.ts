@@ -17,7 +17,7 @@ export async function getNeededs(): Promise<{
 }> {
   const localData = checkLocalStorageData();
   if (!localData) {
-    throw new Error("Sessione non trovata. Effettua il login.");
+    throw new Error("Sessione non trovata. Effettua il login. Neededs");
   }
 
   let response: Response;

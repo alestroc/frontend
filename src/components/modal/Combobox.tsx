@@ -96,13 +96,13 @@ export default function Combobox({
   return (
     <div ref={wrapperRef} className="relative flex flex-row w-full">
       {label && (
-        <label className="block text-sm font-semibold mb-1 text-black">
+        <label className="block text-sm font-semibold mb-1 text-slate-700">
           {label}
         </label>
       )}
       <input
         type="text"
-        className="w-full rounded-md px-3 py-2 bg-white text-black border border-gray-300 focus:outline-none focus:border-orange-500"
+        className="w-full rounded-md px-3 py-2 bg-white text-slate-900 border border-slate-300 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-colors"
         placeholder={placeholder}
         value={displayValue}
         onFocus={() => {
@@ -120,10 +120,10 @@ export default function Combobox({
       {isOpen && (
         <ul
           ref={listRef}
-          className="absolute flex flex-col z-10 mt-10 w-full max-h-48 overflow-auto bg-white border border-gray-300 rounded-md shadow-lg"
+          className="absolute flex flex-col z-10 mt-10 w-full max-h-48 overflow-auto bg-white border border-slate-200 rounded-md shadow-lg"
         >
           {visibleOptions.length === 0 ? (
-            <li className="px-3 py-2 text-sm text-gray-500">
+            <li className="px-3 py-2 text-sm text-slate-500">
               Nessun risultato
             </li>
           ) : (
@@ -134,8 +134,10 @@ export default function Combobox({
                   onClick={() => selectOption(option)}
                   onMouseEnter={() => setHighlightedIndex(i)}
                   className={[
-                    "px-3 py-2 text-start text-sm text-black cursor-pointer",
-                    i === highlightedIndex ? "bg-orange-100" : "",
+                    "px-3 py-2 text-start text-sm cursor-pointer transition-colors",
+                    i === highlightedIndex
+                      ? "bg-blue-50 text-blue-900"
+                      : "text-slate-900",
                     option.id === value ? "font-semibold" : "",
                   ].join(" ")}
                 >
@@ -143,7 +145,7 @@ export default function Combobox({
                 </li>
               ))}
               {hiddenCount > 0 && (
-                <li className="px-3 py-2 text-xs text-gray-500 italic border-t border-gray-200">
+                <li className="px-3 py-2 text-xs text-slate-500 italic border-t border-slate-200 bg-slate-50">
                   +{hiddenCount} altri risultati — digita per ricercare la
                   commessa desiderata
                 </li>

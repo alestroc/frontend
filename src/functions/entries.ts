@@ -10,7 +10,7 @@ interface ApiResponse<T> {
 export async function getEntries(): Promise<TimeEntry[]> {
   const localData = checkLocalStorageData();
   if (!localData) {
-    throw new Error("Sessione non trovata. Effettua il login.");
+    throw new Error("Sessione non trovata. Effettua il login. getEntries");
   }
 
   let response: Response;
@@ -65,7 +65,7 @@ export async function addTimeEntries(
 ): Promise<void> {
   const localData = checkLocalStorageData();
   if (!localData) {
-    throw new Error("Sessione non trovata. Effettua il login.");
+    throw new Error("Sessione non trovata. Effettua il login. addEntries");
   }
 
   let response: Response;

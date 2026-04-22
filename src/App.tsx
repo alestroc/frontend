@@ -122,7 +122,7 @@ function App() {
       {!isLogged ? (
         <LoginPage isLogged={setIsLogged} />
       ) : (
-        <div className="flex flex-row bg-slate-800 w-full h-full overflow-auto">
+        <div className="flex flex-row bg-slate-900 w-full h-full overflow-auto">
           {isModalActive && (
             <Modal
               entries={entries}
@@ -155,7 +155,7 @@ function App() {
                     label === sideBarItems[0].label
                       ? sideBarStyle.button.addAttivita
                       : "",
-                    view === label ? "bg-blue-500" : "",
+                    view === label ? "bg-blue-700" : "",
                     collapsed ? "flex items-center justify-center" : "",
                   ].join(" ")}
                   onClick={() => handleSidebar(label)}
@@ -178,13 +178,9 @@ function App() {
         </div>
       )}
       {error && (
-        <div className=" absolute top-2 right-2 justify-center w-[20%] h-15">
-          <div className="flex flex-col">
-            <div className="text-center items-center p-6 rounded-lg border border-red-300 bg-red-50 dark:bg-red-900/20 dark:border-red-800">
-              <p className="text-sm font-semibold text-red-700 dark:text-red-400">
-                {error}
-              </p>
-            </div>
+        <div className="absolute top-4 right-4 z-50 min-w-64">
+          <div className="p-4 rounded-lg border border-red-200 bg-red-50 shadow-lg">
+            <p className="text-sm font-medium text-red-900">{error}</p>
           </div>
         </div>
       )}
@@ -196,8 +192,9 @@ export default App;
 
 const sideBarStyle = {
   button: {
-    default: "border-l flex rounded-md p-2 w-full hover:cursor-pointer",
-    addAttivita: " bg-blue-500 ",
+    default:
+      "flex items-center rounded-md px-3 py-2 w-full text-left text-slate-100 hover:bg-slate-800 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900",
+    addAttivita: " bg-blue-600 hover:bg-blue-700 text-white font-medium ",
   },
   icon: "mr-2",
 };

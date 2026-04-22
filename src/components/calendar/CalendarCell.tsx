@@ -32,20 +32,22 @@ export default function CalendarCell({
       onClick={() => !disabled && onClick()}
       style={{ display: "grid", gridTemplateRows: "auto 1fr auto" }}
       className={[
-        "p-1 border transition overflow-hidden ",
+        "p-1 border transition-colors overflow-hidden",
         disabled
-          ? "opacity-40 cursor-not-allowed"
-          : "cursor-pointer hover:border-orange-500",
+          ? "opacity-40 cursor-not-allowed border-slate-700 bg-slate-800/60"
+          : "cursor-pointer hover:border-blue-400",
         isToday
-          ? "bg-[#4868a0] hover:bg-[#3d5989]"
-          : "border-gray-200 dark:border-gray-700",
-        isSelected ? "bg-red-500" : "",
+          ? "bg-blue-600 border-blue-600 hover:bg-blue-700"
+          : !disabled
+            ? "bg-slate-800 border-slate-700"
+            : "",
+        isSelected ? "ring-2 ring-blue-400 ring-inset" : "",
       ].join(" ")}
     >
       <div
         className={[
           "text-xs font-semibold mb-1",
-          isToday ? "text-black" : "text-white",
+          isToday ? "text-white" : "text-slate-100",
         ].join(" ")}
       >
         {date.getDate()}
@@ -60,8 +62,10 @@ export default function CalendarCell({
           {totalHours !== 0 && (
             <div
               className={[
-                "border-t text-center border-gray-200 dark:border-gray-600 text-xs font-semibold text-black dark:text-gray-300",
-                totalHours === 8 ? "bg-green-500" : "bg-red-500",
+                "border-t text-center text-xs font-semibold",
+                totalHours === 8
+                  ? "bg-emerald-600 text-white border-emerald-700"
+                  : "bg-red-400 text-slate-900 border-red-500",
               ].join(" ")}
             >
               {totalHours}h
