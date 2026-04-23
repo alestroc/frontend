@@ -26,7 +26,7 @@ export function createEmptyRow(): EntryRow {
 interface EntryRowEditorProps {
   row: EntryRow;
   commesseOptions: ComboboxOption[];
-  articoliOptions: ComboboxOption[];
+  articoli: ComboboxOption[];
   hoursConfig: { min: number; max: number; step: number };
   onUpdate: (patch: Partial<EntryRow>) => void;
   onRemove?: () => void;
@@ -38,14 +38,14 @@ const inputClass =
 export default function EntryRowEditor({
   row,
   commesseOptions,
-  articoliOptions,
+  articoli,
   hoursConfig,
   onUpdate,
   onRemove,
 }: EntryRowEditorProps) {
   return (
     <div className="flex gap-2 items-start">
-      <div className="flex-5">
+      <div className="flex-4">
         <Combobox
           options={commesseOptions}
           value={row.idcommessa}
@@ -53,9 +53,9 @@ export default function EntryRowEditor({
           placeholder="Seleziona commessa"
         />
       </div>
-      <div className="flex-2">
+      <div className="flex-1">
         <Combobox
-          options={articoliOptions}
+          options={articoli}
           value={row.idarticolo}
           onChange={(id) => onUpdate({ idarticolo: id })}
           placeholder="Seleziona articolo"
@@ -72,12 +72,12 @@ export default function EntryRowEditor({
           className={inputClass}
         />
       </div>
-      <div className="flex-2">
+      <div className="flex-5 overflow-auto">
         <input
           type="text"
           value={row.nota}
           onChange={(e) => onUpdate({ nota: e.target.value })}
-          className={inputClass}
+          className={[inputClass, "overflow-hidden"].join(" ")}
         />
       </div>
       <div className="w-8 flex items-center justify-center">

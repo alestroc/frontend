@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { AppSettings, TimeEntry } from "../../types";
+import type { ApiSettings, TimeEntry } from "../../types";
 import { dateToKey, getWeekStart } from "../../functions/functions";
 import { DAYS_OF_WEEK, MONTHS } from "../../functions/config";
 import MonthView from "./MonthView";
@@ -10,7 +10,7 @@ import CalendarNav from "./CalendarNav";
 
 interface CalendarProps {
   entries: TimeEntry[];
-  settings: AppSettings | null;
+  settings: ApiSettings | null;
   view: string;
   selected?: string | null;
   isModal?: boolean;

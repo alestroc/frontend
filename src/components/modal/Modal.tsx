@@ -1,4 +1,10 @@
-import type { AppSettings, Articolo, Commessa, TimeEntry } from "../../types";
+import type {
+  ApiSettings,
+  Articolo,
+  Commessa,
+  ProcessedFavorite,
+  TimeEntry,
+} from "../../types";
 import Calendar from "../calendar/Calendar";
 import ConfirmDialog from "./ConfirmDialog";
 import EntryList from "./EntryList";
@@ -8,16 +14,18 @@ import EntryRowEditor, {
 } from "./EntryRowEditor";
 import { useMemo, useState } from "react";
 import { addTimeEntries } from "../../functions/entries";
+import Favorites from "../favorites/Favorites";
 
 interface ModalProp {
   entries: TimeEntry[];
-  settings: AppSettings | null;
+  settings: ApiSettings | null;
   isModalActive: React.Dispatch<React.SetStateAction<boolean>>;
   selectedDay?: string | null;
   onSaved?: () => void;
   commesse: Commessa[];
   articoli: Articolo[];
   neededsError?: string | null;
+  favorites: ProcessedFavorite[];
 }
 
 function Modal({
@@ -29,6 +37,7 @@ function Modal({
   commesse,
   articoli,
   neededsError = null,
+  favorites,
 }: ModalProp) {
   const [selectedDay, setSelectedDay] = useState<string | null>(initialDay);
   const [rows, setRows] = useState<EntryRow[]>([createEmptyRow()]);
@@ -36,6 +45,7 @@ function Modal({
   const [formError, setFormError] = useState<string | null>(null);
   const [showConfirm, setShowConfirm] = useState(false);
 
+  //raggruppa le entries in un dizionario raggruppato per giorno
   const entriesByDay = entries.reduce<Record<string, TimeEntry[]>>(
     (acc, entry) => {
       if (!acc[entry.giorno]) acc[entry.giorno] = [];
@@ -45,6 +55,7 @@ function Modal({
     {},
   );
 
+  //
   const newTotalHours = rows.reduce((sum, r) => sum + (Number(r.ore) || 0), 0);
   const existingEntries = selectedDay ? (entriesByDay[selectedDay] ?? []) : [];
   const existingHours = existingEntries.reduce(
@@ -53,11 +64,12 @@ function Modal({
   );
   const maxHours = settings?.maxHours ?? 8;
 
-  const commesseOptions = useMemo(
+  //crea l'array di commesse e articoli
+  const commesseAll = useMemo(
     () => commesse.map((c) => ({ id: c.id, label: c.name })),
     [commesse],
   );
-  const articoliOptions = useMemo(
+  const articoliAll = useMemo(
     () => articoli.map((a) => ({ id: a.id, label: a.name })),
     [articoli],
   );
@@ -103,6 +115,7 @@ function Modal({
   function handleConferma() {
     setFormError(null);
     const err = validate();
+
     if (err) {
       setFormError(err);
       return;
@@ -149,27 +162,27 @@ function Modal({
             {selectedDay?.split("-").reverse().join("-") ?? "nessuno"}
           </span>
         </h4>
-        <div className="flex justify-between gap-3 h-60 px-4">
-          <div className="flex-1 rounded-md border border-slate-200 bg-slate-900 overflow-hidden">
+        <div className="flex justify-between gap-3 h-30 px-4">
+          <div className="flex-1 rounded-md border border-slate-200 min-h-30 bg-slate-900 overflow-hidden">
             <Calendar
               entries={entries}
               settings={settings}
-              view={"Mensile"}
+              view={"Settimanale"}
               isModal={true}
               selected={selectedDay}
               handleClickDay={(key) => setSelectedDay(key)}
             />
           </div>
-          <div className="flex-1 rounded-md border border-slate-200 bg-slate-50 p-3 text-sm text-slate-500">
-            SLAVATAGGIO PREFERITI/PRESET
+          <div className="flex-1 min-h-0 overflow-y-auto rounded-md border border-slate-200 bg-slate-50 p-3 text-sm text-slate-500">
+            <Favorites favorite={favorites} />
           </div>
         </div>
         <div className="border-t border-slate-200 flex flex-col gap-3 px-4 py-4 mt-4">
           <div className="flex gap-2 text-xs font-semibold uppercase tracking-wide text-white">
-            <div className="flex-5">Commessa</div>
-            <div className="flex-2">Articolo</div>
+            <div className="flex-4">Commessa</div>
+            <div className="flex-1">Articolo</div>
             <div className="flex-1">Ore</div>
-            <div className="flex-2">Nota</div>
+            <div className="flex-5">Nota</div>
             <div className="w-8" />
           </div>
 
@@ -177,8 +190,8 @@ function Modal({
             <EntryRowEditor
               key={r.rowId}
               row={r}
-              commesseOptions={commesseOptions}
-              articoliOptions={articoliOptions}
+              commesseOptions={commesseAll}
+              articoli={articoliAll}
               hoursConfig={hoursConfig}
               onUpdate={(patch) => updateRow(r.rowId, patch)}
               onRemove={i > 0 ? () => removeRow(r.rowId) : undefined}
@@ -188,7 +201,7 @@ function Modal({
           <button
             type="button"
             onClick={addRow}
-            className="self-start px-3 py-1.5 rounded-md border border-slate-300 bg-slate-500 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+            className="self-start px-3 py-1.5 rounded-md border border-slate-300 bg-slate-500 text-md font-bold  hover:bg-slate-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
           >
             +
           </button>
@@ -203,8 +216,7 @@ function Modal({
           <EntryList
             entries={existingEntries}
             onDelete={(entry) => {
-              // TODO: eliminare entry
-              console.log("elimina entry:", entry);
+              console.log("Aggiungi ai preferiti:", entry);
             }}
           />
         </div>

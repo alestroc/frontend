@@ -41,7 +41,9 @@ export async function getNeededs(): Promise<{
 
   const data: ApiResponse = await response.json();
   if (!data.result) {
-    throw new Error("La sessione è scaduta. Effettua nuovamente il login.");
+    throw new Error(
+      "La sessione è scaduta. Effettua nuovamente il login. geNeededs",
+    );
   }
 
   return {

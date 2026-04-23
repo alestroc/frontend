@@ -18,22 +18,18 @@ export default function Combobox({
   options,
   value,
   onChange,
-  placeholder = "Cerca...",
   label,
 }: ComboboxProps) {
   const [query, setQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(0);
-  const wrapperRef = useRef<HTMLDivElement>(null);
+  const inputArea = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
 
   // chiude il dropdown quando si clicca fuori dal componente
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
-      if (
-        wrapperRef.current &&
-        !wrapperRef.current.contains(e.target as Node)
-      ) {
+      if (inputArea.current && !inputArea.current.contains(e.target as Node)) {
         setIsOpen(false);
       }
     }
@@ -94,7 +90,7 @@ export default function Combobox({
   }
 
   return (
-    <div ref={wrapperRef} className="relative flex flex-row w-full">
+    <div ref={inputArea} className="relative flex flex-row w-full">
       {label && (
         <label className="block text-sm font-semibold mb-1 text-slate-700">
           {label}
@@ -103,7 +99,7 @@ export default function Combobox({
       <input
         type="text"
         className="w-full rounded-md px-3 py-2 bg-white text-slate-900 border border-slate-300 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-colors"
-        placeholder={placeholder}
+        placeholder="Cerca"
         value={displayValue}
         onFocus={() => {
           setQuery(selectedOption?.label ?? "");
