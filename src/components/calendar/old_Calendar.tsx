@@ -1,12 +1,12 @@
 import { useState } from "react";
-import type { AppSettings, TimeEntry } from "../../types";
+import type { ApiSettings, TimeEntry } from "../../types";
 import EntryBadge from "./EntryBadge";
 import { dateToKey, getWeekStart } from "../../functions/functions";
 import MonthView from "./MonthView";
 
 interface CalendarProps {
   entries: TimeEntry[];
-  settings: AppSettings | null;
+  settings: ApiSettings | null;
   view: string;
   selected?: Date | null;
 }

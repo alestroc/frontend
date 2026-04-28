@@ -1,4 +1,4 @@
-export interface AppSettings {
+export interface ApiSettings {
   daysBefore: number;
   minHours: number;
   maxHours: number;
@@ -35,4 +35,19 @@ export interface Commessa {
 export interface Articolo {
   id: string;
   name: string;
+}
+//Favorites così come arrivano dal backend
+export interface Favorite {
+  id: number;
+  idcommessa: string;
+  idarticolo: string;
+  order_no: number;
+}
+// Favorites dopo aver trovato il name della commessa
+export interface ProcessedFavorite {
+  id: number;
+  idcommessa: string;
+  nomecommessa: string;
+  idarticolo: string;
+  order_no: number;
 }

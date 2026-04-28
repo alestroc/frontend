@@ -1,9 +1,14 @@
 import LoginPage from "./components/Login";
 import "./App.css";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Calendar from "./components/calendar/Calendar";
 import Sidebar from "./components/Sidebar";
-import type { AppSettings, TimeEntry } from "./types";
+import type {
+  ApiSettings,
+  Favorite,
+  ProcessedFavorite,
+  TimeEntry,
+} from "./types";
 import {
   checkIsLogged,
   deleteLocalStorageData,
@@ -20,19 +25,21 @@ import AddTaskIcon from "@mui/icons-material/AddTask";
 import type { SvgIconComponent } from "@mui/icons-material";
 import Modal from "./components/modal/Modal";
 import { useNeededs } from "./hooks/useNeededs";
+import { getFavorites } from "./functions/favorites";
 
 function App() {
   const [isLogged, setIsLogged] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [view, setView] = useState("Mensile");
-  const [settings, setSettings] = useState<AppSettings | null>(null);
+  const [settings, setSettings] = useState<ApiSettings | null>(null);
   const [entries, setEntries] = useState<TimeEntry[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isModalActive, setIsModalActive] = useState(false);
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
   const [collapsed, setCollapsed] = useState(false);
+  const [rawFavorites, setRawFavorites] = useState<Favorite[]>([]);
 
-  const { commesse, articoli, error: neededsError } = useNeededs();
+  const { commesse, articoli, error: neededsError } = useNeededs(isLogged);
 
   type SidebarItem = { label: string; Icon: SvgIconComponent };
 
@@ -64,20 +71,41 @@ function App() {
     if (!isLogged) return;
     const loadData = async () => {
       try {
-        const [appSettings, apiEntries] = await Promise.all([
+        const [apiSettings, apiEntries, favorites] = await Promise.all([
           getSettings(),
           getEntries(),
+          getFavorites(),
         ]);
-        setSettings(appSettings);
+        setSettings(apiSettings);
         setEntries(apiEntries);
+        setRawFavorites(favorites);
       } catch (e) {
-        setError(e instanceof Error ? e.message : "Errore imprevisto.");
+        setError(
+          e instanceof Error
+            ? e.message
+            : "Errore imprevisto. Controlla la connessione",
+        );
       } finally {
         setIsLoading(false);
       }
     };
     loadData();
   }, [isLogged]);
+
+  const processedFavorites = useMemo<ProcessedFavorite[]>(() => {
+    return rawFavorites.map((fav) => {
+      const c = commesse.find((x) => x.id === fav.idcommessa);
+      const a = articoli.find((x) => x.id === fav.idarticolo);
+      return {
+        id: fav.id,
+        idcommessa: fav.idcommessa,
+        nomecommessa: c?.name ?? "?",
+        idarticolo: fav.idarticolo,
+        nomearticolo: a?.name ?? "?",
+        order_no: fav.order_no,
+      };
+    });
+  }, [rawFavorites, commesse, articoli]);
 
   async function reloadEntries() {
     try {
@@ -132,7 +160,8 @@ function App() {
               onSaved={reloadEntries}
               commesse={commesse}
               articoli={articoli}
-              // neededsError={neededsError}
+              neededsError={neededsError}
+              favorites={processedFavorites}
             />
           )}
           <Sidebar

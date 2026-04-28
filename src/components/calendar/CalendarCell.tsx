@@ -37,7 +37,7 @@ export default function CalendarCell({
           ? "opacity-40 cursor-not-allowed border-slate-700 bg-slate-800/60"
           : "cursor-pointer hover:border-blue-400",
         isToday
-          ? "bg-blue-600 border-blue-600 hover:bg-blue-700"
+          ? "bg-blue-400 border-blue-600 hover:bg-blue-700"
           : !disabled
             ? "bg-slate-800 border-slate-700"
             : "",
