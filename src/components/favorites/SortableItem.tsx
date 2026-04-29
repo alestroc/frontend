@@ -2,6 +2,7 @@ import { useSortable } from "@dnd-kit/react/sortable";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import type { ProcessedFavorite } from "../../types";
 import { removeFavorites } from "../../functions/favorites";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 interface SortableItemProps {
   id: number;
@@ -25,7 +26,7 @@ export default function SortableItem({
         console.log("premuto " + favorite.nomecommessa);
       }}
       className={[
-        "flex items-center justify-between border rounded-sm m-1 p-1 text-xs font-bold bg-blue-200 text-slate-900",
+        "flex items-center justify-between rounded-sm m-1 p-1 text-xs font-bold bg-blue-200 text-slate-900",
         isDragging ? "opacity-50" : "",
       ].join(" ")}
     >
@@ -34,15 +35,15 @@ export default function SortableItem({
       <button
         type="button"
         onPointerDown={(e) => e.stopPropagation()}
-        className="w-8 shrink-0  border hover:bg-red-100"
+        className="w-5 shrink-0 hover:bg-red-100 rounded-full"
         onClick={() => {
           removeFavorites(id);
           setTimeout(() => {
             reloadFavorites();
-          }, 1500);
+          }, 250);
         }}
       >
-        X
+        <DeleteIcon fontSize="small" />
       </button>
       <span
         ref={handleRef}

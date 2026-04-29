@@ -1,10 +1,8 @@
 import { useState } from "react";
 import type { Articolo, Commessa } from "../types";
-import {
-  createEmptyRow,
-  type EntryRow,
-} from "../components/modal/EntryRowEditor";
+import { type EntryRow } from "../components/modal/EntryRowEditor";
 import { addTimeEntries } from "../functions/entries";
+import { createEmptyRow } from "../functions/functions";
 
 interface UseEntryFormOpts {
   selectedDay: string | null;

@@ -50,7 +50,6 @@ export default function Combobox({
   const visibleOptions = allOptions.slice(0, COMBOBOX_MAX_VISIBLE);
   const hiddenCount = allOptions.length - visibleOptions.length;
 
-  // scrolla l'elemento evidenziato dentro la vista quando ci muoviamo con le frecce
   useEffect(() => {
     if (!isOpen || !listRef.current) return;
     const li = listRef.current.children[highlightedIndex] as
@@ -59,8 +58,6 @@ export default function Combobox({
     li?.scrollIntoView({ block: "nearest" });
   }, [highlightedIndex, isOpen]);
 
-  // quando il dropdown è aperto mostriamo la query che l'utente sta digitando,
-  // altrimenti mostriamo il label dell'opzione selezionata
   const displayValue = isOpen ? query : (selectedOption?.label ?? "");
 
   function selectOption(option: ComboboxOption) {

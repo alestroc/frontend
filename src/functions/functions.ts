@@ -1,6 +1,7 @@
 import { BASE_URL } from "./config";
 import type { LocalData, TimeEntry } from "../types";
 import { readLocalData, clearLocalData } from "../storage/localData";
+import type { EntryRow } from "../components/modal/EntryRowEditor";
 
 export const checkLocalStorageData = (): LocalData | false =>
   readLocalData() ?? false;
@@ -52,4 +53,18 @@ export function getWeekStart(date: Date): Date {
   const d = new Date(date);
   d.setDate(d.getDate() - ((d.getDay() + 6) % 7));
   return d;
+}
+
+function makeRowId() {
+  return Math.random().toString(36).slice(2) + Date.now().toString(36);
+}
+
+export function createEmptyRow(): EntryRow {
+  return {
+    rowId: makeRowId(),
+    idcommessa: null,
+    idarticolo: null,
+    ore: "",
+    nota: "",
+  };
 }

@@ -1,4 +1,5 @@
 import type { TimeEntry } from "../../types";
+import StarIcon from "@mui/icons-material/Star";
 
 interface EntryListProps {
   entries: TimeEntry[];
@@ -22,9 +23,9 @@ export default function EntryList({
       {entries.map((entry, i) => (
         <div
           key={i}
-          className="flex items-center justify-between gap-2 p-2 bg-white rounded border border-gray-300"
+          className="flex items-center align-center justify-between gap-2 p-2 bg-white rounded border  border-gray-300"
         >
-          <div className="flex flex-row justify-between w-full text-sm text-black">
+          <div className="flex flex-row justify-between w-full text-sm text-black truncate">
             <span className="flex-4 font-semibold mx-5 ">
               {entry.nomecommessa}
             </span>
@@ -38,10 +39,10 @@ export default function EntryList({
             )}
           </div>
           <button
-            className="text-red-500 hover:text-red-700 text-xs font-semibold shrink-0"
+            className="text-slate-300 hover:text-yellow-400 text-xs font-semibold shrink-0 m-2"
             onClick={() => onInsertFavorite(entry)}
           >
-            Preferiti
+            <StarIcon />
           </button>
         </div>
       ))}

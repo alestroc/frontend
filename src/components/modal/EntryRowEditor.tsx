@@ -9,20 +9,6 @@ export type EntryRow = {
   nota: string;
 };
 
-function makeRowId() {
-  return Math.random().toString(36).slice(2) + Date.now().toString(36);
-}
-
-export function createEmptyRow(): EntryRow {
-  return {
-    rowId: makeRowId(),
-    idcommessa: null,
-    idarticolo: null,
-    ore: "",
-    nota: "",
-  };
-}
-
 interface EntryRowEditorProps {
   row: EntryRow;
   commesseOptions: ComboboxOption[];
@@ -61,7 +47,7 @@ export default function EntryRowEditor({
           placeholder="Seleziona articolo"
         />
       </div>
-      <div className="flex-1">
+      <div className="flex-1 ">
         <input
           type="number"
           step={hoursConfig.step}

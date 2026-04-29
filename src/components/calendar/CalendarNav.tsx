@@ -19,7 +19,7 @@ export default function CalendarNav({
       <button onClick={onPrev} className={`${navBtn} text-lg`}>
         ‹
       </button>
-      <span className="font-semibold text-lg text-center w-72 text-slate-100">
+      <span className="font-semibold text-md text-center w-72 truncate text-slate-100">
         {label}
       </span>
       <button onClick={onNext} className={`${navBtn} text-lg`}>
