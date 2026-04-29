@@ -1,5 +1,5 @@
 import type { Commessa, Articolo } from "../types";
-import { checkLocalStorageData } from "./functions";
+import { readLocalData } from "../storage/localData";
 import { BASE_URL } from "./config";
 
 interface ApiResponse {
@@ -15,9 +15,9 @@ export async function getNeededs(): Promise<{
   commesse: Commessa[];
   articoli: Articolo[];
 }> {
-  const localData = checkLocalStorageData();
+  const localData = readLocalData();
   if (!localData) {
-    throw new Error("Sessione non trovata. Effettua il login. Neededs");
+    throw new Error("Sessione non trovata. Effettua il login.");
   }
 
   let response: Response;
@@ -33,7 +33,8 @@ export async function getNeededs(): Promise<{
         localid: localData.localid,
       }),
     });
-  } catch {
+  } catch (e) {
+    console.error("getNeededs: fetch fallita", e);
     throw new Error(
       "Impossibile raggiungere il server. Controlla la connessione.",
     );
@@ -41,9 +42,7 @@ export async function getNeededs(): Promise<{
 
   const data: ApiResponse = await response.json();
   if (!data.result) {
-    throw new Error(
-      "La sessione è scaduta. Effettua nuovamente il login. geNeededs",
-    );
+    throw new Error("La sessione è scaduta. Effettua nuovamente il login.");
   }
 
   return {

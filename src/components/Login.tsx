@@ -1,6 +1,7 @@
 import { useState, type Dispatch, type SetStateAction } from "react";
 import logo from "../assets/logo.svg";
 import { BASE_URL } from "../functions/config";
+import { writeLocalData } from "../storage/localData";
 
 export default function LoginPage({
   isLogged,
@@ -29,7 +30,7 @@ export default function LoginPage({
         setError("Credenziali non valide.");
         return;
       }
-      localStorage.setItem("dati", JSON.stringify(r.data));
+      writeLocalData(r.data);
       isLogged(true);
     } catch {
       setError("Errore di connessione.");

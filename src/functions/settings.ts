@@ -5,7 +5,8 @@ export async function getSettings(): Promise<ApiSettings> {
   let response: Response;
   try {
     response = await fetch(`${BASE_URL}/getSettings`);
-  } catch {
+  } catch (e) {
+    console.error("getSettings: fetch fallita", e);
     throw new Error(
       "Impossibile raggiungere il server. Controlla la connessione.",
     );

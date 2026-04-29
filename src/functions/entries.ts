@@ -1,5 +1,5 @@
 import type { TimeEntry } from "../types";
-import { checkLocalStorageData } from "./functions";
+import { readLocalData } from "../storage/localData";
 import { BASE_URL } from "./config";
 
 interface ApiResponse<T> {
@@ -8,9 +8,9 @@ interface ApiResponse<T> {
 }
 
 export async function getEntries(): Promise<TimeEntry[]> {
-  const localData = checkLocalStorageData();
+  const localData = readLocalData();
   if (!localData) {
-    throw new Error("Sessione non trovata. Effettua il login. getEntries");
+    throw new Error("Sessione non trovata. Effettua il login.");
   }
 
   let response: Response;
@@ -28,7 +28,8 @@ export async function getEntries(): Promise<TimeEntry[]> {
         to: 3944678400,
       }),
     });
-  } catch {
+  } catch (e) {
+    console.error("getEntries: fetch fallita", e);
     throw new Error(
       "Impossibile raggiungere il server. Controlla la connessione.",
     );
@@ -36,9 +37,7 @@ export async function getEntries(): Promise<TimeEntry[]> {
 
   const data: ApiResponse<TimeEntry[]> = await response.json();
   if (!data.result) {
-    throw new Error(
-      "La sessione è scaduta. Effettua nuovamente il login. getEntries",
-    );
+    throw new Error("La sessione è scaduta. Effettua nuovamente il login.");
   }
 
   if (!data.data || data.data.length === 0) return [];
@@ -65,9 +64,9 @@ export async function addTimeEntries(
   giorno: string,
   entries: NewEntry[],
 ): Promise<void> {
-  const localData = checkLocalStorageData();
+  const localData = readLocalData();
   if (!localData) {
-    throw new Error("Sessione non trovata. Effettua il login. addEntries");
+    throw new Error("Sessione non trovata. Effettua il login.");
   }
 
   let response: Response;
@@ -86,7 +85,8 @@ export async function addTimeEntries(
         entries,
       }),
     });
-  } catch {
+  } catch (e) {
+    console.error("addTimeEntries: fetch fallita", e);
     throw new Error(
       "Impossibile raggiungere il server. Controlla la connessione.",
     );

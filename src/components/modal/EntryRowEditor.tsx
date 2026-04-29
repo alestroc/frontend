@@ -26,7 +26,7 @@ export function createEmptyRow(): EntryRow {
 interface EntryRowEditorProps {
   row: EntryRow;
   commesseOptions: ComboboxOption[];
-  articoli: ComboboxOption[];
+  articoliOptions: ComboboxOption[];
   hoursConfig: { min: number; max: number; step: number };
   onUpdate: (patch: Partial<EntryRow>) => void;
   onRemove?: () => void;
@@ -38,7 +38,7 @@ const inputClass =
 export default function EntryRowEditor({
   row,
   commesseOptions,
-  articoli,
+  articoliOptions,
   hoursConfig,
   onUpdate,
   onRemove,
@@ -55,7 +55,7 @@ export default function EntryRowEditor({
       </div>
       <div className="flex-1">
         <Combobox
-          options={articoli}
+          options={articoliOptions}
           value={row.idarticolo}
           onChange={(id) => onUpdate({ idarticolo: id })}
           placeholder="Seleziona articolo"

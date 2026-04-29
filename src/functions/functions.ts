@@ -1,28 +1,15 @@
 import { BASE_URL } from "./config";
 import type { LocalData, TimeEntry } from "../types";
+import { readLocalData, clearLocalData } from "../storage/localData";
 
+export const checkLocalStorageData = (): LocalData | false =>
+  readLocalData() ?? false;
+export const deleteLocalStorageData = clearLocalData;
 export type { LocalData };
-
-// Recupera dati dal LocalStorage
-export function checkLocalStorageData(): LocalData | false {
-  const isDataSaved = localStorage.getItem("dati");
-  if (!isDataSaved) return false;
-
-  try {
-    return JSON.parse(isDataSaved) as LocalData;
-  } catch {
-    return false;
-  }
-}
-
-// Logout — rimuove dati dal LocalStorage
-export function deleteLocalStorageData(): void {
-  localStorage.removeItem("dati");
-}
 
 // Controlla se l'utente è loggato verificando il token sul server
 export async function checkIsLogged(): Promise<boolean> {
-  const localData = checkLocalStorageData();
+  const localData = readLocalData();
   if (!localData) return false;
 
   try {
@@ -52,7 +39,6 @@ export function dateToKey(date: Date): string {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 }
 //crea un dizionario raggruppando le entries in base al giorno
-
 export function groupEntries(entries: TimeEntry[]) {
   entries.reduce<Record<string, TimeEntry[]>>((acc, entry) => {
     if (!acc[entry.giorno]) acc[entry.giorno] = [];

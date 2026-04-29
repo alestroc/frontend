@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-
-const MAX_VISIBLE = 200;
+import { COMBOBOX_MAX_VISIBLE } from "../../config";
 
 export interface ComboboxOption {
   id: string;
@@ -42,10 +41,13 @@ export default function Combobox({
   const allOptions = useMemo(() => {
     if (!query) return options;
     const q = query.toLowerCase();
-    return options.filter((o) => o.label.toLowerCase().includes(q));
+    return options.filter(
+      (o) =>
+        o.label.toLowerCase().includes(q) || o.id.toLowerCase().includes(q),
+    );
   }, [options, query]);
 
-  const visibleOptions = allOptions.slice(0, MAX_VISIBLE);
+  const visibleOptions = allOptions.slice(0, COMBOBOX_MAX_VISIBLE);
   const hiddenCount = allOptions.length - visibleOptions.length;
 
   // scrolla l'elemento evidenziato dentro la vista quando ci muoviamo con le frecce

@@ -2,10 +2,12 @@ import { useEffect, useState } from "react";
 import type { Articolo, Commessa } from "../types";
 import { getNeededs } from "../functions/neededs";
 
-export function useNeededs(isLogged: boolean) {
+export function useNeededs(
+  isLogged: boolean,
+  showError?: (message: string) => void,
+) {
   const [commesse, setCommesse] = useState<Commessa[]>([]);
   const [articoli, setArticoli] = useState<Articolo[]>([]);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isLogged) {
@@ -15,12 +17,15 @@ export function useNeededs(isLogged: boolean) {
       .then(({ commesse, articoli }) => {
         setCommesse(commesse);
         setArticoli(articoli);
-        setError(null);
       })
       .catch((e: unknown) => {
-        setError(e instanceof Error ? e.message : "Errore nel caricamento.");
+        const msg =
+          e instanceof Error
+            ? e.message
+            : "Errore nel caricamento di commesse e articoli.";
+        showError?.(msg);
       });
-  }, [isLogged]);
+  }, [isLogged, showError]);
 
-  return { commesse, articoli, error };
+  return { commesse, articoli };
 }
