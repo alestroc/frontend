@@ -1,20 +1,20 @@
-import type {
-  ApiSettings,
-  Articolo,
-  Commessa,
-  ProcessedFavorite,
-  TimeEntry,
-} from "../../types";
+import type { ApiSettings, Articolo, Commessa, TimeEntry } from "../../types";
+import type { ProcessedFavorite } from "../../types";
 import Calendar from "../calendar/Calendar";
 import ConfirmDialog from "./ConfirmDialog";
 import EntryList from "./EntryList";
-import EntryRowEditor, {
-  type EntryRow,
-  createEmptyRow,
-} from "./EntryRowEditor";
+import EntryRowEditor from "./EntryRowEditor";
 import { useMemo, useState } from "react";
-import { addTimeEntries } from "../../functions/entries";
 import Favorites from "../favorites/Favorites";
+import { useEntriesByDay } from "../../hooks/useEntriesByDay";
+import { useEntryForm } from "../../hooks/useEntryForm";
+import {
+  DEFAULT_HOURS_INTERVAL,
+  DEFAULT_MAX_HOURS,
+  DEFAULT_MIN_HOURS,
+} from "../../config";
+import { addFavorite } from "../../functions/favorites";
+// import { SettingsInputSvideo } from "@mui/icons-material";
 
 interface ModalProp {
   entries: TimeEntry[];
@@ -24,8 +24,9 @@ interface ModalProp {
   onSaved?: () => void;
   commesse: Commessa[];
   articoli: Articolo[];
-  neededsError?: string | null;
   favorites: ProcessedFavorite[];
+  showError?: (message: string) => void;
+  reloadFavorites: () => void;
 }
 
 function Modal({
@@ -36,117 +37,65 @@ function Modal({
   onSaved,
   commesse,
   articoli,
-  neededsError = null,
   favorites,
+  showError,
+  reloadFavorites,
 }: ModalProp) {
   const [selectedDay, setSelectedDay] = useState<string | null>(initialDay);
-  const [rows, setRows] = useState<EntryRow[]>([createEmptyRow()]);
-  const [isSaving, setIsSaving] = useState(false);
-  const [formError, setFormError] = useState<string | null>(null);
   const [showConfirm, setShowConfirm] = useState(false);
 
-  //raggruppa le entries in un dizionario raggruppato per giorno
-  const entriesByDay = entries.reduce<Record<string, TimeEntry[]>>(
-    (acc, entry) => {
-      if (!acc[entry.giorno]) acc[entry.giorno] = [];
-      acc[entry.giorno].push(entry);
-      return acc;
-    },
-    {},
+  const entriesByDay = useEntriesByDay(entries);
+  const existingEntries = useMemo(
+    () => (selectedDay ? (entriesByDay[selectedDay] ?? []) : []),
+    [selectedDay, entriesByDay],
   );
-
-  //
-  const newTotalHours = rows.reduce((sum, r) => sum + (Number(r.ore) || 0), 0);
-  const existingEntries = selectedDay ? (entriesByDay[selectedDay] ?? []) : [];
-  const existingHours = existingEntries.reduce(
-    (sum, e) => sum + Number(e.ore),
-    0,
+  const existingHours = useMemo(
+    () => existingEntries.reduce((sum, e) => sum + Number(e.ore), 0),
+    [existingEntries],
   );
-  const maxHours = settings?.maxHours ?? 8;
+  const maxHours = settings?.maxHours ?? DEFAULT_MAX_HOURS;
 
-  //crea l'array di commesse e articoli
-  const commesseAll = useMemo(
+  const commesseOptions = useMemo(
     () => commesse.map((c) => ({ id: c.id, label: c.name })),
     [commesse],
   );
-  const articoliAll = useMemo(
+  const articoliOptions = useMemo(
     () => articoli.map((a) => ({ id: a.id, label: a.name })),
     [articoli],
   );
   const hoursConfig = {
-    min: settings?.minHours ?? 0,
+    min: settings?.minHours ?? DEFAULT_MIN_HOURS,
     max: maxHours,
-    step: settings?.hoursInterval ?? 0.5,
+    step: settings?.hoursInterval ?? DEFAULT_HOURS_INTERVAL,
   };
 
-  function updateRow(rowId: string, patch: Partial<EntryRow>) {
-    setRows((prev) =>
-      prev.map((r) => (r.rowId === rowId ? { ...r, ...patch } : r)),
-    );
-  }
+  const form = useEntryForm({
+    selectedDay,
+    existingHours,
+    commesse,
+    articoli,
+    maxHours,
+    onSaved,
+  });
 
-  function addRow() {
-    setRows((prev) => [...prev, createEmptyRow()]);
-  }
-
-  function removeRow(rowId: string) {
-    setRows((prev) => prev.filter((r) => r.rowId !== rowId));
-  }
-
-  function validate(): string | null {
-    if (!selectedDay) return "Seleziona un giorno.";
-    for (const r of rows) {
-      if (!r.idcommessa || !r.idarticolo) {
-        return "Seleziona commessa e articolo per ogni riga.";
-      }
-      if (!r.ore || Number(r.ore) <= 0 || Number(r.ore) > maxHours) {
-        return "Inserisci ore valide per ogni riga.";
-      }
-      if (!r.nota.trim()) {
-        return "Inserisci una nota per ogni riga.";
-      }
-    }
-    if (existingHours + newTotalHours > maxHours) {
-      return `Superato il limite giornaliero di ${maxHours} ore (${existingHours}h già registrate + ${newTotalHours}h nuove).`;
-    }
-    return null;
-  }
-
-  function handleConferma() {
-    setFormError(null);
-    const err = validate();
-
+  function handleConfirm() {
+    form.setFormError(null);
+    const err = form.validate();
     if (err) {
-      setFormError(err);
+      form.setFormError(err);
       return;
     }
     setShowConfirm(true);
   }
 
   async function handleConfirmSave() {
-    if (!selectedDay) return;
-    setIsSaving(true);
     try {
-      const newEntries = rows.map((r) => {
-        const c = commesse.find((x) => x.id === r.idcommessa);
-        const a = articoli.find((x) => x.id === r.idarticolo);
-        return {
-          idcommessa: r.idcommessa!,
-          nomecommessa: c?.name ?? "",
-          idarticolo: r.idarticolo!,
-          nomearticolo: a?.name ?? "",
-          ore: r.ore,
-          nota: r.nota,
-        };
-      });
-      await addTimeEntries(selectedDay, newEntries);
-      onSaved?.();
+      await form.save();
       isModalActive(false);
     } catch (e: unknown) {
-      setFormError(e instanceof Error ? e.message : "Errore nel salvataggio.");
+      const msg = e instanceof Error ? e.message : "Errore nel salvataggio.";
+      showError?.(msg);
       setShowConfirm(false);
-    } finally {
-      setIsSaving(false);
     }
   }
 
@@ -174,7 +123,10 @@ function Modal({
             />
           </div>
           <div className="flex-1 min-h-0 overflow-y-auto rounded-md border border-slate-200 bg-slate-50 p-3 text-sm text-slate-500">
-            <Favorites favorite={favorites} />
+            <Favorites
+              favorites={favorites}
+              reloadFavorites={reloadFavorites}
+            />
           </div>
         </div>
         <div className="border-t border-slate-200 flex flex-col gap-3 px-4 py-4 mt-4">
@@ -186,51 +138,58 @@ function Modal({
             <div className="w-8" />
           </div>
 
-          {rows.map((r, i) => (
+          {form.rows.map((r, i) => (
             <EntryRowEditor
               key={r.rowId}
               row={r}
-              commesseOptions={commesseAll}
-              articoli={articoliAll}
+              commesseOptions={commesseOptions}
+              articoliOptions={articoliOptions}
               hoursConfig={hoursConfig}
-              onUpdate={(patch) => updateRow(r.rowId, patch)}
-              onRemove={i > 0 ? () => removeRow(r.rowId) : undefined}
+              onUpdate={(patch) => form.updateRow(r.rowId, patch)}
+              onRemove={i > 0 ? () => form.removeRow(r.rowId) : undefined}
             />
           ))}
 
           <button
             type="button"
-            onClick={addRow}
+            onClick={form.addRow}
             className="self-start px-3 py-1.5 rounded-md border border-slate-300 bg-slate-500 text-md font-bold  hover:bg-slate-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
           >
             +
           </button>
 
-          {(formError || neededsError) && (
+          {form.formError && (
             <p className="text-sm font-medium text-red-700 bg-red-50 border border-red-200 rounded-md px-3 py-2">
-              {formError ?? neededsError}
+              {form.formError}
             </p>
           )}
         </div>
         <div className="border-t border-slate-200 flex flex-col gap-2 px-4 py-4 bg-slate-400">
           <EntryList
             entries={existingEntries}
-            onDelete={(entry) => {
-              console.log("Aggiungi ai preferiti:", entry);
+            onInsertFavorite={async (entry) => {
+              try {
+                await addFavorite(entry);
+                reloadFavorites();
+              } catch (e) {
+                showError?.(
+                  e instanceof Error ? e.message : "Errore aggiunta preferito.",
+                );
+              }
             }}
           />
         </div>
         <div className="sticky bottom-0 flex bg-slate-600 border-t border-slate-200 justify-end w-full p-3 gap-2">
           <button
-            onClick={handleConferma}
-            disabled={isSaving}
+            onClick={handleConfirm}
+            disabled={form.isSaving}
             className="px-4 py-2 rounded-md bg-blue-600 text-white font-medium hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             Conferma
           </button>
           <button
             onClick={() => isModalActive(false)}
-            disabled={isSaving}
+            disabled={form.isSaving}
             className="px-4 py-2 rounded-md border border-slate-300 bg-white text-slate-700 font-medium hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:opacity-50 transition-colors"
           >
             Annulla
@@ -243,13 +202,13 @@ function Modal({
           title="Confermi l'inserimento?"
           message={
             <>
-              Confermi l'inserimento di <strong>{newTotalHours}h</strong> per il
-              giorno <strong>{selectedDay}</strong>?
+              Confermi l'inserimento di <strong>{form.newTotalHours}h</strong>{" "}
+              per il giorno <strong>{selectedDay}</strong>?
             </>
           }
           onConfirm={handleConfirmSave}
           onCancel={() => setShowConfirm(false)}
-          isLoading={isSaving}
+          isLoading={form.isSaving}
         />
       )}
     </>

@@ -2,6 +2,8 @@ import { useState } from "react";
 import type { ApiSettings, TimeEntry } from "../../types";
 import { dateToKey, getWeekStart } from "../../functions/functions";
 import { DAYS_OF_WEEK, MONTHS } from "../../functions/config";
+import { DEFAULT_DAYS_BEFORE } from "../../config";
+import { useEntriesByDay } from "../../hooks/useEntriesByDay";
 import MonthView from "./MonthView";
 import WeekView from "./WeekView";
 import DayView from "./DayView";
@@ -34,17 +36,10 @@ export default function Calendar({
     return today;
   });
 
-  const entriesByDay = entries.reduce<Record<string, TimeEntry[]>>(
-    (acc, entry) => {
-      if (!acc[entry.giorno]) acc[entry.giorno] = [];
-      acc[entry.giorno].push(entry);
-      return acc;
-    },
-    {},
-  );
+  const entriesByDay = useEntriesByDay(entries);
 
   const daysBefore = new Date(today);
-  daysBefore.setDate(today.getDate() - (settings?.daysBefore ?? 120));
+  daysBefore.setDate(today.getDate() - (settings?.daysBefore ?? DEFAULT_DAYS_BEFORE));
 
   const todayKey = dateToKey(today);
   const daysBeforeKey = dateToKey(daysBefore);

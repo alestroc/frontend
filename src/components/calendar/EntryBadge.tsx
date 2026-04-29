@@ -4,11 +4,14 @@ interface EntryBadgeProp {
   view: string;
   entry: TimeEntry;
 }
+
+//Componente che mostra le commesse nella casella del calendario
 export default function EntryBadge({ entry, view }: EntryBadgeProp) {
   function StringToNum(hour: string) {
     const numFromString = Number(hour);
     return numFromString;
   }
+
   return (
     <div
       className={[
@@ -26,6 +29,7 @@ export default function EntryBadge({ entry, view }: EntryBadgeProp) {
     </div>
   );
 }
+
 const Styles = {
   default:
     "bg-blue-100 text-blue-900 border border-blue-200 rounded mb-1 px-1.5 truncate ",
