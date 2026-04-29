@@ -2,10 +2,13 @@ import type { TimeEntry } from "../../types";
 
 interface EntryListProps {
   entries: TimeEntry[];
-  onDelete: (entry: TimeEntry) => void;
+  onInsertFavorite: (entry: TimeEntry) => void;
 }
 // Visualizza le entries già salvate in quel giorno.
-export default function EntryList({ entries, onDelete }: EntryListProps) {
+export default function EntryList({
+  entries,
+  onInsertFavorite,
+}: EntryListProps) {
   if (entries.length === 0) {
     return (
       <p className="text-sm text-gray-500">
@@ -36,8 +39,7 @@ export default function EntryList({ entries, onDelete }: EntryListProps) {
           </div>
           <button
             className="text-red-500 hover:text-red-700 text-xs font-semibold shrink-0"
-            //TODO: implementare nel backend il delete delle entries già salvate
-            onClick={() => onDelete(entry)}
+            onClick={() => onInsertFavorite(entry)}
           >
             Preferiti
           </button>

@@ -1,23 +1,27 @@
 import { DragDropProvider } from "@dnd-kit/react";
 import { move } from "@dnd-kit/helpers";
 import SortableItem from "./SortableItem";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { ProcessedFavorite } from "../../types";
 
 interface FavoritesProps {
-  favorite: ProcessedFavorite[];
+  favorites: ProcessedFavorite[];
+  reloadFavorites: () => void;
 }
 
-export default function Favorites({ favorite }: FavoritesProps) {
-  // all'inizio ordiniamo per order_no (valore che arriva dal backend)
-  // lazy initializer: lo spread evita di mutare la prop
-  const [favorites, setFavorites] = useState(() =>
-    [...favorite].sort((a, b) => a.order_no - b.order_no),
+export default function Favorites({
+  favorites: initialFavorites,
+  reloadFavorites,
+}: FavoritesProps) {
+  const [favorites, setFavorites] = useState<ProcessedFavorite[]>(() =>
+    [...initialFavorites].sort((a, b) => a.order_no - b.order_no),
   );
-  useEffect(() => {
-    const updatedId = favorites.map((e) => e.id);
-    console.log(updatedId);
-  }, [favorites]);
+  const [prevInitial, setPrevInitial] = useState(initialFavorites);
+  if (initialFavorites !== prevInitial) {
+    setPrevInitial(initialFavorites);
+    setFavorites([...initialFavorites].sort((a, b) => a.order_no - b.order_no));
+  }
+
   return (
     <DragDropProvider
       onDragEnd={(event) => {
@@ -25,7 +29,13 @@ export default function Favorites({ favorite }: FavoritesProps) {
       }}
     >
       {favorites.map((fav, index) => (
-        <SortableItem key={fav.id} id={fav.id} index={index} favorite={fav} />
+        <SortableItem
+          key={fav.id}
+          id={fav.id}
+          index={index}
+          favorite={fav}
+          reloadFavorites={reloadFavorites}
+        />
       ))}
     </DragDropProvider>
   );

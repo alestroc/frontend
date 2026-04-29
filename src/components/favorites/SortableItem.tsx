@@ -1,23 +1,29 @@
 import { useSortable } from "@dnd-kit/react/sortable";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import type { ProcessedFavorite } from "../../types";
+import { removeFavorites } from "../../functions/favorites";
 
 interface SortableItemProps {
   id: number;
   index: number;
   favorite: ProcessedFavorite;
+  reloadFavorites: () => void;
 }
 
 export default function SortableItem({
   id,
   index,
   favorite,
+  reloadFavorites,
 }: SortableItemProps) {
   const { ref, handleRef, isDragging } = useSortable({ id, index });
 
   return (
     <div
       ref={ref}
+      onClick={() => {
+        console.log("premuto " + favorite.nomecommessa);
+      }}
       className={[
         "flex items-center justify-between border rounded-sm m-1 p-1 text-xs font-bold bg-blue-200 text-slate-900",
         isDragging ? "opacity-50" : "",
@@ -29,6 +35,12 @@ export default function SortableItem({
         type="button"
         onPointerDown={(e) => e.stopPropagation()}
         className="w-8 shrink-0  border hover:bg-red-100"
+        onClick={() => {
+          removeFavorites(id);
+          setTimeout(() => {
+            reloadFavorites();
+          }, 1500);
+        }}
       >
         X
       </button>

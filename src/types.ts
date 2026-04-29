@@ -36,14 +36,14 @@ export interface Articolo {
   id: string;
   name: string;
 }
-//Favorites così come arrivano dal backend
+// Favorite così come arriva dal backend
 export interface Favorite {
   id: number;
   idcommessa: string;
   idarticolo: string;
   order_no: number;
 }
-// Favorites dopo aver trovato il name della commessa
+//Favorite dopo aver trovato il name della commessa
 export interface ProcessedFavorite {
   id: number;
   idcommessa: string;

@@ -1,14 +1,10 @@
 import LoginPage from "./components/Login";
 import "./App.css";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Calendar from "./components/calendar/Calendar";
 import Sidebar from "./components/Sidebar";
-import type {
-  ApiSettings,
-  Favorite,
-  ProcessedFavorite,
-  TimeEntry,
-} from "./types";
+import type { ApiSettings, Favorite, TimeEntry } from "./types";
+import type { ProcessedFavorite } from "./types";
 import {
   checkIsLogged,
   deleteLocalStorageData,
@@ -26,6 +22,7 @@ import type { SvgIconComponent } from "@mui/icons-material";
 import Modal from "./components/modal/Modal";
 import { useNeededs } from "./hooks/useNeededs";
 import { getFavorites } from "./functions/favorites";
+import { LOGIN_HINT_TTL_MS, TOAST_TTL_MS } from "./config";
 
 function App() {
   const [isLogged, setIsLogged] = useState(false);
@@ -39,7 +36,27 @@ function App() {
   const [collapsed, setCollapsed] = useState(false);
   const [rawFavorites, setRawFavorites] = useState<Favorite[]>([]);
 
-  const { commesse, articoli, error: neededsError } = useNeededs(isLogged);
+  // Timer per l'auto-dismiss del toast — useRef perché non deve causare re-render
+  const errorTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Mostra un errore globale che si auto-dismissa dopo TOAST_TTL_MS.
+  // useCallback per riferimento stabile (passato in deps di useNeededs).
+  const showError = useCallback((message: string, ttl = TOAST_TTL_MS) => {
+    setError(message);
+    if (errorTimerRef.current) clearTimeout(errorTimerRef.current);
+    errorTimerRef.current = setTimeout(() => {
+      setError(null);
+      errorTimerRef.current = null;
+    }, ttl);
+  }, []);
+
+  function dismissError() {
+    if (errorTimerRef.current) clearTimeout(errorTimerRef.current);
+    errorTimerRef.current = null;
+    setError(null);
+  }
+
+  const { commesse, articoli } = useNeededs(isLogged, showError);
 
   type SidebarItem = { label: string; Icon: SvgIconComponent };
 
@@ -56,16 +73,13 @@ function App() {
     const init = async () => {
       const loggedIn = await checkIsLogged();
       if (!loggedIn) {
-        setError("Effettuare il login");
-        setTimeout(() => {
-          setError(null);
-        }, 2000);
+        showError("Effettuare il login", LOGIN_HINT_TTL_MS);
       }
       setIsLogged(loggedIn);
       setIsLoading(false);
     };
     init();
-  }, []);
+  }, [showError]);
 
   useEffect(() => {
     if (!isLogged) return;
@@ -80,7 +94,7 @@ function App() {
         setEntries(apiEntries);
         setRawFavorites(favorites);
       } catch (e) {
-        setError(
+        showError(
           e instanceof Error
             ? e.message
             : "Errore imprevisto. Controlla la connessione",
@@ -90,29 +104,36 @@ function App() {
       }
     };
     loadData();
-  }, [isLogged]);
+  }, [isLogged, showError]);
 
   const processedFavorites = useMemo<ProcessedFavorite[]>(() => {
     return rawFavorites.map((fav) => {
       const c = commesse.find((x) => x.id === fav.idcommessa);
-      const a = articoli.find((x) => x.id === fav.idarticolo);
       return {
         id: fav.id,
         idcommessa: fav.idcommessa,
         nomecommessa: c?.name ?? "?",
         idarticolo: fav.idarticolo,
-        nomearticolo: a?.name ?? "?",
         order_no: fav.order_no,
       };
     });
-  }, [rawFavorites, commesse, articoli]);
+  }, [rawFavorites, commesse]);
 
   async function reloadEntries() {
     try {
       const apiEntries = await getEntries();
       setEntries(apiEntries);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Errore imprevisto.");
+      showError(e instanceof Error ? e.message : "Errore imprevisto.");
+    }
+  }
+
+  async function reloadFavorites() {
+    try {
+      const favorite = await getFavorites();
+      setRawFavorites(favorite);
+    } catch (e) {
+      showError(e instanceof Error ? e.message : "Errore imprevisto.");
     }
   }
 
@@ -160,8 +181,9 @@ function App() {
               onSaved={reloadEntries}
               commesse={commesse}
               articoli={articoli}
-              neededsError={neededsError}
               favorites={processedFavorites}
+              showError={showError}
+              reloadFavorites={reloadFavorites}
             />
           )}
           <Sidebar
@@ -207,10 +229,18 @@ function App() {
         </div>
       )}
       {error && (
-        <div className="absolute top-4 right-4 z-50 min-w-64">
-          <div className="p-4 rounded-lg border border-red-200 bg-red-50 shadow-lg">
-            <p className="text-sm font-medium text-red-900">{error}</p>
-          </div>
+        <div
+          role="alert"
+          className="absolute top-4 right-4 z-50 min-w-64 flex items-start gap-2 p-4 rounded-lg border border-red-200 bg-red-50 shadow-lg"
+        >
+          <p className="flex-1 text-sm font-medium text-red-900">{error}</p>
+          <button
+            onClick={dismissError}
+            aria-label="Chiudi"
+            className="text-red-900 opacity-60 hover:opacity-100 leading-none"
+          >
+            ×
+          </button>
         </div>
       )}
     </>
