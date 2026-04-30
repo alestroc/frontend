@@ -1,8 +1,9 @@
 import { DragDropProvider } from "@dnd-kit/react";
 import { move } from "@dnd-kit/helpers";
 import SortableItem from "./SortableItem";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { ProcessedFavorite } from "../../types";
+import { reorderFavorite } from "../../functions/favorites";
 
 interface FavoritesProps {
   favorites: ProcessedFavorite[];
@@ -23,6 +24,9 @@ export default function Favorites({
     setPrevInitial(initialFavorites);
     setFavorites([...initialFavorites].sort((a, b) => a.order_no - b.order_no));
   }
+  useEffect(() => {
+    reorderFavorite(favorites);
+  }, [favorites]);
 
   return (
     <DragDropProvider

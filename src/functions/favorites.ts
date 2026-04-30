@@ -1,4 +1,4 @@
-import type { Favorite, TimeEntry } from "../types";
+import type { Favorite, ProcessedFavorite, TimeEntry } from "../types";
 import { checkLocalStorageData } from "./functions";
 import { BASE_URL } from "./config";
 
@@ -104,4 +104,38 @@ export async function removeFavorites(id: number): Promise<void> {
     );
   }
   return console.log("eliminato");
+}
+
+export async function reorderFavorite(
+  arrFavorites: Array<ProcessedFavorite>,
+): Promise<void> {
+  const localData = checkLocalStorageData();
+  if (!localData) {
+    throw new Error(
+      "Sessione non trovata. Effettua il login. reorderFavorites",
+    );
+  }
+  const arrIdFavorites = arrFavorites.map((element) => {
+    return element.id;
+  });
+
+  console.log(arrIdFavorites);
+
+  let response: Response;
+  try {
+    response = await fetch(`${BASE_URL}/reorderFavorites`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${localData.token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        user: localData.user,
+        localid: localData.localid,
+        favoriteIds: arrIdFavorites,
+      }),
+    });
+  } catch {
+    throw new Error("Errore nella chiamata al server.");
+  }
 }
