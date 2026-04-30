@@ -7,11 +7,13 @@ import type { ProcessedFavorite } from "../../types";
 interface FavoritesProps {
   favorites: ProcessedFavorite[];
   reloadFavorites: () => void;
+  autocompleteFavorite: (fav: ProcessedFavorite) => void;
 }
 
 export default function Favorites({
   favorites: initialFavorites,
   reloadFavorites,
+  autocompleteFavorite,
 }: FavoritesProps) {
   const [favorites, setFavorites] = useState<ProcessedFavorite[]>(() =>
     [...initialFavorites].sort((a, b) => a.order_no - b.order_no),
@@ -35,6 +37,7 @@ export default function Favorites({
           index={index}
           favorite={fav}
           reloadFavorites={reloadFavorites}
+          autocompleteFavorite={autocompleteFavorite}
         />
       ))}
     </DragDropProvider>

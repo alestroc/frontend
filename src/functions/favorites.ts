@@ -65,19 +65,8 @@ export async function addFavorite(favorite: TimeEntry): Promise<boolean> {
       }),
     });
   } catch {
-    throw new Error(
-      "Problema con il server. Controlla la connessione. addFavorite",
-    );
+    throw new Error("Favorito già salvato.");
   }
-
-  const data = await response.json();
-  if (!data.id) {
-    throw new Error(
-      "La sessione è scaduta. Effettua nuovamente il login. addFavorite",
-    );
-  }
-
-  if (data.length === 0) return false;
 
   return true;
 }
@@ -114,6 +103,5 @@ export async function removeFavorites(id: number): Promise<void> {
       "La sessione è scaduta. Effettua nuovamente il login. removeFavorites",
     );
   }
-
   return console.log("eliminato");
 }

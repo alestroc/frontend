@@ -23,17 +23,17 @@ export default function EntryList({
       {entries.map((entry, i) => (
         <div
           key={i}
-          className="flex items-center align-center justify-between gap-2 p-2 bg-white rounded border  border-gray-300"
+          className="flex items-center align-center justify-between gap-2 bg-white rounded border  border-gray-300"
         >
-          <div className="flex flex-row justify-between w-full text-sm text-black truncate">
-            <span className="flex-4 font-semibold mx-5 ">
+          <div className="flex flex-row justify-between w-full p-2 text-sm text-black truncate">
+            <span className="flex-4 font-semibold truncate">
               {entry.nomecommessa}
             </span>
             <span className="flex-2 text-xs text-gray-600 mx-5 ">
               {entry.idarticolo} · {entry.ore}h
             </span>
             {entry.nota && (
-              <span className="flex-4 text-xs text-gray-500 italic mx-5">
+              <span className="flex-4 text-xs text-gray-500 italic">
                 {entry.nota}
               </span>
             )}

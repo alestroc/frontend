@@ -30,7 +30,7 @@ export default function EntryRowEditor({
   onRemove,
 }: EntryRowEditorProps) {
   return (
-    <div className="flex gap-2 items-start">
+    <div className="flex gap-2 items-start ">
       <div className="flex-4">
         <Combobox
           options={commesseOptions}
@@ -39,7 +39,7 @@ export default function EntryRowEditor({
           placeholder="Seleziona commessa"
         />
       </div>
-      <div className="flex-1">
+      <div className="flex-2">
         <Combobox
           options={articoliOptions}
           value={row.idarticolo}
@@ -47,7 +47,7 @@ export default function EntryRowEditor({
           placeholder="Seleziona articolo"
         />
       </div>
-      <div className="flex-1 ">
+      <div className="flex-2 ">
         <input
           type="number"
           step={hoursConfig.step}
@@ -55,7 +55,7 @@ export default function EntryRowEditor({
           max={hoursConfig.max}
           value={row.ore}
           onChange={(e) => onUpdate({ ore: e.target.value })}
-          className={inputClass}
+          className={[inputClass, "appearance-none"].join(" ")}
         />
       </div>
       <div className="flex-5 overflow-auto">

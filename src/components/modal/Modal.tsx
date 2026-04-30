@@ -105,14 +105,14 @@ function Modal({
         <h2 className="px-6 pt-5 text-xl font-semibold text-red-500">
           Registra Nuova Attività
         </h2>
-        <h4 className="sticky botttom-0 px-6 pb-4 text-sm font-medium text-white">
+        <h4 className="sticky botttom-0 px-6 pb-4 text-sm font-medium text-white ">
           Giorno selezionato:{" "}
           <span className="text-white font-semibold">
             {selectedDay?.split("-").reverse().join("-") ?? "nessuno"}
           </span>
         </h4>
-        <div className="flex justify-between gap-3 h-30 px-4">
-          <div className="flex-1 rounded-md border border-slate-200 min-h-30 bg-slate-900 overflow-hidden">
+        <div className="flex justify-between gap-3 min-h-35 px-4">
+          <div className="flex-1 rounded-md border border-slate-200 bg-slate-900 overflow-hidden">
             <Calendar
               entries={entries}
               settings={settings}
@@ -126,14 +126,15 @@ function Modal({
             <Favorites
               favorites={favorites}
               reloadFavorites={reloadFavorites}
+              autocompleteFavorite={form.pickFavorite}
             />
           </div>
         </div>
         <div className="border-t border-slate-200 flex flex-col gap-3 px-4 py-4 mt-4">
           <div className="flex gap-2 text-xs font-semibold uppercase tracking-wide text-white">
             <div className="flex-4">Commessa</div>
-            <div className="flex-1">Articolo</div>
-            <div className="flex-1">Ore</div>
+            <div className="flex-2">Articolo</div>
+            <div className="flex-2">Ore</div>
             <div className="flex-5">Nota</div>
             <div className="w-8" />
           </div>

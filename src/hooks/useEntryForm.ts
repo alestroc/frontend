@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { Articolo, Commessa } from "../types";
+import type { Articolo, Commessa, ProcessedFavorite } from "../types";
 import { type EntryRow } from "../components/modal/EntryRowEditor";
 import { addTimeEntries } from "../functions/entries";
 import { createEmptyRow } from "../functions/functions";
@@ -16,7 +16,6 @@ interface UseEntryFormOpts {
 export function useEntryForm(opts: UseEntryFormOpts) {
   const { selectedDay, existingHours, commesse, articoli, maxHours, onSaved } =
     opts;
-
   const [rows, setRows] = useState<EntryRow[]>([createEmptyRow()]);
   const [isSaving, setIsSaving] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
@@ -35,6 +34,28 @@ export function useEntryForm(opts: UseEntryFormOpts) {
     setRows((prev) =>
       prev.map((r) => (r.rowId === rowId ? { ...r, ...patch } : r)),
     );
+  }
+
+  function pickFavorite(fav: ProcessedFavorite) {
+    //cerco se c'è una riga vuota
+    const empty = rows.find((r) => !r.idcommessa && !r.idarticolo);
+    if (empty) {
+      // se l'ho trovata, popolo l'input coi valori
+      updateRow(empty.rowId, {
+        idcommessa: fav.idcommessa,
+        idarticolo: fav.idarticolo,
+      });
+    } else {
+      setRows((prev) => [
+        ...prev,
+        {
+          // aggiungo una riga
+          ...createEmptyRow(),
+          idcommessa: fav.idcommessa,
+          idarticolo: fav.idarticolo,
+        },
+      ]);
+    }
   }
 
   // Ritorna un messaggio di errore se le righe non sono valide, altrimenti null.
@@ -90,6 +111,7 @@ export function useEntryForm(opts: UseEntryFormOpts) {
     addRow,
     removeRow,
     updateRow,
+    pickFavorite,
     validate,
     save,
     setFormError,
