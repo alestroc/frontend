@@ -44,7 +44,7 @@ export default function LoginPage({
         <span
           className="text-white text-2xl font-light tracking-[0.22em] uppercase"
           style={{
-            fontFamily: "'Futura', 'Century Gothic', 'Nunito Sans', sans-serif",
+            fontFamily: "Century Gothic",
           }}
         >
           studium

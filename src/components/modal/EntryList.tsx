@@ -29,14 +29,13 @@ export default function EntryList({
             <span className="flex-4 font-semibold truncate">
               {entry.nomecommessa}
             </span>
-            <span className="flex-2 text-xs text-gray-600 mx-5 ">
+            <span className="flex-2 text-xs text-gray-600 mx-5">
               {entry.idarticolo} · {entry.ore}h
             </span>
-            {entry.nota && (
-              <span className="flex-4 text-xs text-gray-500 italic">
-                {entry.nota}
-              </span>
-            )}
+
+            <span className="flex-4 text-xs text-gray-500 italic">
+              {entry.nota}
+            </span>
           </div>
           <button
             className="text-slate-300 hover:text-yellow-400 text-xs font-semibold shrink-0 m-2"

@@ -38,8 +38,7 @@ export default function Sidebar({
             <span
               className="text-slate-100 text-xl font-light uppercase tracking-widest"
               style={{
-                fontFamily:
-                  "'Futura', 'Century Gothic', 'Nunito Sans', sans-serif",
+                fontFamily: "Century Gothic",
               }}
             >
               studium

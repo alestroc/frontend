@@ -49,9 +49,8 @@ export async function addFavorite(favorite: TimeEntry): Promise<boolean> {
   if (!localData) {
     throw new Error("Sessione non trovata. Effettua il login. (addFavorites)");
   }
-  let response: Response;
   try {
-    response = await fetch(`${BASE_URL}/addFavorite`, {
+    await fetch(`${BASE_URL}/addFavorite`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${localData.token}`,
@@ -121,9 +120,8 @@ export async function reorderFavorite(
 
   console.log(arrIdFavorites);
 
-  let response: Response;
   try {
-    response = await fetch(`${BASE_URL}/reorderFavorites`, {
+    await fetch(`${BASE_URL}/reorderFavorites`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${localData.token}`,

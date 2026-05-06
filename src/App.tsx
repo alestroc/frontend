@@ -34,13 +34,13 @@ function App() {
   const [isModalActive, setIsModalActive] = useState(false);
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
   const [collapsed, setCollapsed] = useState(false);
+  // i favorites che arrivano dal backend non hanno nomecommessa
+  // ProcessedFavorites è il preferito con il nome commessa per la visualizzazione UI
   const [rawFavorites, setRawFavorites] = useState<Favorite[]>([]);
 
-  // Timer per l'auto-dismiss del toast — useRef perché non deve causare re-render
+  // Timer per estinguere il toast
   const errorTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Mostra un errore globale che si auto-dismissa dopo TOAST_TTL_MS.
-  // useCallback per riferimento stabile (passato in deps di useNeededs).
   const showError = useCallback((message: string, ttl = TOAST_TTL_MS) => {
     setError(message);
     if (errorTimerRef.current) clearTimeout(errorTimerRef.current);
@@ -55,7 +55,7 @@ function App() {
     errorTimerRef.current = null;
     setError(null);
   }
-
+  // funzione che chiama le API per ricevere commesse e articoli
   const { commesse, articoli } = useNeededs(isLogged, showError);
 
   type SidebarItem = { label: string; Icon: SvgIconComponent };
@@ -106,6 +106,8 @@ function App() {
     loadData();
   }, [isLogged, showError]);
 
+  // valore che viene salvato in memoria per evitare che venga calcolato ad ogni re-render
+  // se le dipendenze (rawFavorites,commesse) cambiano, la funzione viene rieseguita per salvare il valore
   const processedFavorites = useMemo<ProcessedFavorite[]>(() => {
     return rawFavorites.map((fav) => {
       const c = commesse.find((x) => x.id === fav.idcommessa);
