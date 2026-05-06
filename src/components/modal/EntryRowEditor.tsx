@@ -16,10 +16,11 @@ interface EntryRowEditorProps {
   hoursConfig: { min: number; max: number; step: number };
   onUpdate: (patch: Partial<EntryRow>) => void;
   onRemove?: () => void;
+  isMultiDay: boolean;
 }
 
 const inputClass =
-  "w-full rounded-md px-3 py-2 bg-white text-slate-900 border border-slate-300 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-colors";
+  "w-full rounded-md px-2 py-2 bg-white text-slate-900 border border-slate-300 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-colors";
 
 export default function EntryRowEditor({
   row,
@@ -28,9 +29,10 @@ export default function EntryRowEditor({
   hoursConfig,
   onUpdate,
   onRemove,
+  isMultiDay,
 }: EntryRowEditorProps) {
   return (
-    <div className="flex gap-2 items-start ">
+    <div className="flex flex-1 gap-2 items-center ">
       <div className="flex-4">
         <Combobox
           options={commesseOptions}
@@ -47,25 +49,29 @@ export default function EntryRowEditor({
           placeholder="Seleziona articolo"
         />
       </div>
-      <div className="flex-2 ">
-        <input
-          type="number"
-          step={hoursConfig.step}
-          min={hoursConfig.min}
-          max={hoursConfig.max}
-          value={row.ore}
-          onChange={(e) => onUpdate({ ore: e.target.value })}
-          className={[inputClass, "appearance-none"].join(" ")}
-        />
-      </div>
-      <div className="flex-5 overflow-auto">
-        <input
-          type="text"
-          value={row.nota}
-          onChange={(e) => onUpdate({ nota: e.target.value })}
-          className={[inputClass, "overflow-hidden"].join(" ")}
-        />
-      </div>
+      {!isMultiDay && (
+        <>
+          <div className="flex-2 ">
+            <input
+              type="number"
+              step={hoursConfig.step}
+              min={hoursConfig.min}
+              max={hoursConfig.max}
+              value={row.ore}
+              onChange={(e) => onUpdate({ ore: e.target.value })}
+              className={[inputClass, "appearance-textfield"].join(" ")}
+            />
+          </div>
+          <div className="flex-5 overflow-auto">
+            <input
+              type="text"
+              value={row.nota}
+              onChange={(e) => onUpdate({ nota: e.target.value })}
+              className={[inputClass, "overflow-hidden"].join(" ")}
+            />
+          </div>
+        </>
+      )}
       <div className="w-8 flex items-center justify-center">
         {onRemove && (
           <button

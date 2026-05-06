@@ -62,7 +62,7 @@ export type NewEntry = Omit<TimeEntry, "giorno">;
 
 export async function addTimeEntries(
   giorno: string,
-  entries: NewEntry[],
+  entries: NewEntry[] | NewEntry,
 ): Promise<void> {
   const localData = readLocalData();
   if (!localData) {

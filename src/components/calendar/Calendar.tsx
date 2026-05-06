@@ -14,7 +14,11 @@ interface CalendarProps {
   entries: TimeEntry[];
   settings: ApiSettings | null;
   view: string;
+  // Selezione singola: una sola key viene evidenziata.
   selected?: string | null;
+  // Selezione multipla: tutte le key elencate vengono evidenziate.
+  // Se passato, ha precedenza su `selected`.
+  selectedDays?: string[] | null;
   isModal?: boolean;
   handleClickDay?: (key: string) => void;
 }
@@ -26,8 +30,10 @@ export default function Calendar({
   isModal = false,
   handleClickDay,
   selected = null,
+  selectedDays = null,
 }: CalendarProps) {
   const today = new Date();
+  // cursor è il punto di riferimento per la creazione del calendario.
   const [cursor, setCursor] = useState(() => {
     if (selected) {
       const d = new Date(selected);
@@ -35,12 +41,14 @@ export default function Calendar({
     }
     return today;
   });
-
+  // crea un dizionario raggruppando le entries in base al giorno.
   const entriesByDay = useEntriesByDay(entries);
 
   const daysBefore = new Date(today);
-  daysBefore.setDate(today.getDate() - (settings?.daysBefore ?? DEFAULT_DAYS_BEFORE));
-
+  daysBefore.setDate(
+    today.getDate() - (settings?.daysBefore ?? DEFAULT_DAYS_BEFORE),
+  );
+  // processa il Date per avere YYYY-MM-DD
   const todayKey = dateToKey(today);
   const daysBeforeKey = dateToKey(daysBefore);
 
@@ -57,13 +65,16 @@ export default function Calendar({
 
   function renderCell(date: Date) {
     const key = dateToKey(date);
+    const isSelected = selectedDays
+      ? selectedDays.includes(key)
+      : key === selected;
     return (
       <CalendarCell
         key={key}
         date={date}
         entries={entriesByDay[key] ?? []}
         isToday={key === todayKey}
-        isSelected={key === selected}
+        isSelected={isSelected}
         disabled={isDisabled(date)}
         isModal={isModal}
         view={view}
