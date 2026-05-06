@@ -13,7 +13,7 @@ interface UseEntryFormOpts {
   onSaved?: () => void;
 }
 //Contiene la logica di gestione del form di input nel modale
-export function useEntryForm(opts: UseEntryFormOpts) {
+export function useSingleDayEntryForm(opts: UseEntryFormOpts) {
   const { selectedDay, existingHours, commesse, articoli, maxHours, onSaved } =
     opts;
   const [rows, setRows] = useState<EntryRow[]>([createEmptyRow()]);
@@ -49,7 +49,7 @@ export function useEntryForm(opts: UseEntryFormOpts) {
       setRows((prev) => [
         ...prev,
         {
-          // aggiungo una riga
+          //altrimenti aggiungo una riga e compilo
           ...createEmptyRow(),
           idcommessa: fav.idcommessa,
           idarticolo: fav.idarticolo,
@@ -79,7 +79,7 @@ export function useEntryForm(opts: UseEntryFormOpts) {
   }
 
   // Trasforma le righe del form in NewEntry e chiama l'API.
-  // Assume che validate() sia già stata chiamata con successo.
+  // Assume che validate() sia stata chiamata con successo.
   async function save(): Promise<void> {
     if (!selectedDay) return;
     setIsSaving(true);
