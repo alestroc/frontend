@@ -118,8 +118,6 @@ export async function reorderFavorite(
     return element.id;
   });
 
-  console.log(arrIdFavorites);
-
   try {
     await fetch(`${BASE_URL}/reorderFavorites`, {
       method: "POST",

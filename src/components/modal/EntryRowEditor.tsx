@@ -1,3 +1,4 @@
+import { inputClass } from "../../functions/config";
 import Combobox, { type ComboboxOption } from "./Combobox";
 import ClearIcon from "@mui/icons-material/Clear";
 
@@ -19,9 +20,6 @@ interface EntryRowEditorProps {
   isMultiDay: boolean;
 }
 
-const inputClass =
-  "w-full rounded-md px-2 py-2 bg-white text-slate-900 border border-slate-300 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-colors";
-
 export default function EntryRowEditor({
   row,
   commesseOptions,
@@ -29,7 +27,7 @@ export default function EntryRowEditor({
   hoursConfig,
   onUpdate,
   onRemove,
-  isMultiDay,
+  isMultiDay = false,
 }: EntryRowEditorProps) {
   return (
     <div className="flex flex-1 gap-2 items-center ">
@@ -54,6 +52,7 @@ export default function EntryRowEditor({
           <div className="flex-2 ">
             <input
               type="number"
+              placeholder="Ore"
               step={hoursConfig.step}
               min={hoursConfig.min}
               max={hoursConfig.max}
@@ -65,6 +64,7 @@ export default function EntryRowEditor({
           <div className="flex-5 overflow-auto">
             <input
               type="text"
+              placeholder="Nota"
               value={row.nota}
               onChange={(e) => onUpdate({ nota: e.target.value })}
               className={[inputClass, "overflow-hidden"].join(" ")}

@@ -108,9 +108,9 @@ export default function SingleDayForm({
   return (
     <>
       <h2 className="px-6 pt-5 text-xl font-semibold text-red-500">
-        Multi Mansione su Singola Giornata
+        Inserimento Singolo
       </h2>
-      <h4 className="sticky botttom-0 px-6 pb-4 text-sm font-medium text-white ">
+      <h4 className="px-6 pb-4 text-sm font-medium text-white">
         Giorno selezionato:{" "}
         <span className="text-white font-semibold">
           {selectedDay?.split("-").reverse().join("-") ?? "nessuno"}

@@ -1,5 +1,10 @@
 import { useState } from "react";
-import type { Articolo, Commessa, ProcessedFavorite } from "../types";
+import type {
+  Articolo,
+  Commessa,
+  ProcessedFavorite,
+  TimeEntry,
+} from "../types";
 import { type EntryRow } from "../components/modal/EntryRowEditor";
 import { addTimeEntries } from "../functions/entries";
 
@@ -10,6 +15,7 @@ interface UseMultiDayEntryFormOpts {
   articoli: Articolo[];
   maxHours: number;
   onSaved?: () => void;
+  entries: TimeEntry[];
 }
 //Contiene la logica di gestione del form di input nel modale
 export function useMultiDayEntryForm(opts: UseMultiDayEntryFormOpts) {
@@ -23,6 +29,7 @@ export function useMultiDayEntryForm(opts: UseMultiDayEntryFormOpts) {
     ore: "",
     nota: "",
   });
+
   const [isSaving, setIsSaving] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
 
@@ -48,13 +55,13 @@ export function useMultiDayEntryForm(opts: UseMultiDayEntryFormOpts) {
   function validate(): string | null {
     if (!selectedDays) return "Seleziona un giorno.";
     if (!row.idcommessa || !row.idarticolo) {
-      return "Seleziona commessa e articolo per ogni riga.";
+      return "Seleziona commessa e articolo.";
     }
     if (!row.ore || Number(row.ore) <= 0 || Number(row.ore) > maxHours) {
-      return "Inserisci ore valide per ogni riga.";
+      return "Inserisci un numero di ore valide.";
     }
     if (!row.nota.trim()) {
-      return "Inserisci una nota per ogni riga.";
+      return "Note Obbligatorie.";
     }
     if (existingHours + newTotalHours > maxHours) {
       return `Superato il limite giornaliero di ${maxHours} ore (${existingHours}h già registrate + ${newTotalHours}h nuove).`;
