@@ -1,4 +1,4 @@
-import type { TimeEntry } from "../../types";
+import type { ApiSettings, TimeEntry } from "../../types";
 import EntryBadge from "./EntryBadge";
 
 interface CalendarCellProps {
@@ -10,6 +10,7 @@ interface CalendarCellProps {
   isModal: boolean;
   view: string;
   onClick: () => void;
+  settings: ApiSettings | null;
 }
 
 export default function CalendarCell({
@@ -20,6 +21,7 @@ export default function CalendarCell({
   disabled,
   isModal,
   view,
+  settings,
   onClick,
 }: CalendarCellProps) {
   const totalHours = entries.reduce(
@@ -63,7 +65,7 @@ export default function CalendarCell({
             <div
               className={[
                 "border-t text-center text-xs font-semibold",
-                totalHours === 8
+                (settings ? totalHours === settings.maxHours : totalHours === 8)
                   ? "bg-emerald-600 text-white border-emerald-700"
                   : "bg-red-400 text-slate-900 border-red-500",
               ].join(" ")}

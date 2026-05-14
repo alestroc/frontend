@@ -51,3 +51,17 @@ export interface ProcessedFavorite {
   idarticolo: string;
   order_no: number;
 }
+
+export type AddTimeEntriesByDaysPayload = {
+  commessa: {
+    idcommessa: string;
+    nomecommessa: string | null;
+    idarticolo: string;
+    nomearticolo: string | null;
+  };
+  giornate: Array<{
+    giorno: string; // "YYYY-MM-DD"
+    ore: string;
+    nota: string;
+  }>;
+};

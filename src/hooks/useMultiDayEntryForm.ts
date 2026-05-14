@@ -6,90 +6,100 @@ import type {
   TimeEntry,
 } from "../types";
 import { type EntryRow } from "../components/modal/EntryRowEditor";
-import { addTimeEntries } from "../functions/entries";
+import { addTimeEntriesByDays } from "../functions/entries";
 
 interface UseMultiDayEntryFormOpts {
   selectedDays: string[] | null;
-  existingHours: number;
+  entriesByDay: Record<string, TimeEntry[]>;
   commesse: Commessa[];
   articoli: Articolo[];
   maxHours: number;
   onSaved?: () => void;
-  entries: TimeEntry[];
 }
-//Contiene la logica di gestione del form di input nel modale
+
+type DayInput = { ore: string; nota: string };
+
 export function useMultiDayEntryForm(opts: UseMultiDayEntryFormOpts) {
-  const { selectedDays, existingHours, commesse, articoli, maxHours, onSaved } =
+  const { selectedDays, entriesByDay, commesse, articoli, maxHours, onSaved } =
     opts;
 
   const [row, setRow] = useState<EntryRow>({
     rowId: "",
-    idcommessa: "",
-    idarticolo: "",
+    idcommessa: null,
+    idarticolo: null,
     ore: "",
     nota: "",
   });
-
+  const [dayInputs, setDayInputs] = useState<Record<string, DayInput>>({});
   const [isSaving, setIsSaving] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
 
-  function updateRow(patch: EntryRow) {
-    setRow((prev) => ({
-      ...prev,
-      ...patch,
-    }));
+  function updateRow(patch: Partial<EntryRow>) {
+    setRow((prev) => ({ ...prev, ...patch }));
+  }
+
+  function updateDayInput(day: string, patch: Partial<DayInput>) {
+    setDayInputs((prev) => ({ ...prev, [day]: { ...prev[day], ...patch } }));
   }
 
   function pickFavorite(fav: ProcessedFavorite) {
-    updateRow({
-      rowId: "",
-      idarticolo: fav.idarticolo,
+    setRow((prev) => ({
+      ...prev,
       idcommessa: fav.idcommessa,
-      ore: "",
-      nota: "",
-    });
+      idarticolo: fav.idarticolo,
+    }));
   }
-  const newTotalHours = Number(row.ore);
 
-  // Ritorna un messaggio di errore se le righe non sono valide, altrimenti null.
+  function existingHoursFor(day: string): number {
+    return (entriesByDay[day] ?? []).reduce((sum, e) => sum + Number(e.ore), 0);
+  }
+
   function validate(): string | null {
-    if (!selectedDays) return "Seleziona un giorno.";
+    if (!selectedDays || selectedDays.length === 0) {
+      return "Seleziona almeno un giorno.";
+    }
     if (!row.idcommessa || !row.idarticolo) {
       return "Seleziona commessa e articolo.";
     }
-    if (!row.ore || Number(row.ore) <= 0 || Number(row.ore) > maxHours) {
-      return "Inserisci un numero di ore valide.";
-    }
-    if (!row.nota.trim()) {
-      return "Note Obbligatorie.";
-    }
-    if (existingHours + newTotalHours > maxHours) {
-      return `Superato il limite giornaliero di ${maxHours} ore (${existingHours}h già registrate + ${newTotalHours}h nuove).`;
+    for (const day of selectedDays) {
+      const input = dayInputs[day];
+      if (!input || !input.ore || Number(input.ore) <= 0) {
+        return `Inserisci le ore per il giorno ${day}.`;
+      }
+      if (Number(input.ore) > maxHours) {
+        return `Le ore per il ${day} superano il massimo (${maxHours}h).`;
+      }
+      const existing = existingHoursFor(day);
+      if (existing + Number(input.ore) > maxHours) {
+        return `Il giorno ${day.slice(5).split("-").reverse().join("-")} supera il limite di ${maxHours}h (già ${existing}h registrate).`;
+      }
+      if (!input.nota || !input.nota.trim()) {
+        return `Inserisci una nota per il giorno ${day}.`;
+      }
     }
     return null;
   }
 
-  // Trasforma le righe del form in NewEntry e chiama l'API.
-  // Assume che validate() sia stata chiamata con successo.
-
+  // Trasforma lo state interno in payload e chiama l'API.
+  // Assume che validate() sia già stata chiamata con successo.
   async function save(): Promise<void> {
-    const c = commesse.find((x) => x.id === row.idcommessa);
-    const a = articoli.find((x) => x.id === row.idarticolo);
-    const temp = {
-      idcommessa: row.idcommessa!,
-      nomecommessa: c?.name ?? "",
-      idarticolo: row.idarticolo!,
-      nomearticolo: a?.name ?? "",
-      ore: row.ore,
-      nota: row.nota,
-    };
-    if (!selectedDays) return;
+    if (!selectedDays || !row.idcommessa || !row.idarticolo) return;
     setIsSaving(true);
-
     try {
-      for (let i = 0; i < selectedDays.length; i++) {
-        await addTimeEntries(selectedDays[i], temp);
-      }
+      const c = commesse.find((x) => x.id === row.idcommessa);
+      const a = articoli.find((x) => x.id === row.idarticolo);
+      const commessa = {
+        idcommessa: row.idcommessa,
+        nomecommessa: c?.name ?? null,
+        idarticolo: row.idarticolo,
+        nomearticolo: a?.name ?? null,
+      };
+      const giornate = selectedDays.map((day) => ({
+        giorno: day,
+        ore: dayInputs[day].ore,
+        nota: dayInputs[day].nota,
+      }));
+      await addTimeEntriesByDays({ commessa, giornate });
       onSaved?.();
     } finally {
       setIsSaving(false);
@@ -98,10 +108,11 @@ export function useMultiDayEntryForm(opts: UseMultiDayEntryFormOpts) {
 
   return {
     row,
+    dayInputs,
     isSaving,
     formError,
-    newTotalHours,
     updateRow,
+    updateDayInput,
     pickFavorite,
     validate,
     save,

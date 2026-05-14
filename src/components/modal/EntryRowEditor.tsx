@@ -17,7 +17,9 @@ interface EntryRowEditorProps {
   hoursConfig: { min: number; max: number; step: number };
   onUpdate: (patch: Partial<EntryRow>) => void;
   onRemove?: () => void;
-  isMultiDay: boolean;
+  // true -> mostra anche ore + nota (usata in SingleDayForm).
+  // false -> mostra solo commessa + articolo (la mansione è una sola, usato in MultiDayEntries).
+  isSingleDay: boolean;
 }
 
 export default function EntryRowEditor({
@@ -27,7 +29,7 @@ export default function EntryRowEditor({
   hoursConfig,
   onUpdate,
   onRemove,
-  isMultiDay = false,
+  isSingleDay,
 }: EntryRowEditorProps) {
   return (
     <div className="flex flex-1 gap-2 items-center ">
@@ -47,7 +49,7 @@ export default function EntryRowEditor({
           placeholder="Seleziona articolo"
         />
       </div>
-      {!isMultiDay && (
+      {isSingleDay && (
         <>
           <div className="flex-2 ">
             <input

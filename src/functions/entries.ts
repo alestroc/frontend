@@ -1,4 +1,4 @@
-import type { TimeEntry } from "../types";
+import type { AddTimeEntriesByDaysPayload, TimeEntry } from "../types";
 import { readLocalData } from "../storage/localData";
 import { BASE_URL } from "./config";
 
@@ -53,7 +53,7 @@ export async function getEntries(): Promise<TimeEntry[]> {
   }));
 }
 
-// "YYYY-MM-DD" -> Unix timestamp (secondi) — il backend si aspetta un timestamp
+// "YYYY-MM-DD" -> Unix timestamp in secondi
 function dayToTimestamp(day: string): number {
   return Math.floor(new Date(day).getTime() / 1000);
 }
@@ -87,6 +87,47 @@ export async function addTimeEntries(
     });
   } catch (e) {
     console.error("addTimeEntries: fetch fallita", e);
+    throw new Error(
+      "Impossibile raggiungere il server. Controlla la connessione.",
+    );
+  }
+
+  const data: ApiResponse<unknown> = await response.json();
+  if (!data.result) {
+    throw new Error("Errore nel salvataggio dell'attività.");
+  }
+}
+
+export async function addTimeEntriesByDays(
+  payload: AddTimeEntriesByDaysPayload,
+): Promise<void> {
+  const localData = readLocalData();
+  if (!localData) {
+    throw new Error("Sessione non trovata. Effettua il login.");
+  }
+
+  let response: Response;
+  try {
+    response = await fetch(`${BASE_URL}/addTimeEntriesByDays`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${localData.token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        user: localData.user,
+        localid: localData.localid,
+        idpersonale: localData.idpersonale,
+        commessa: payload.commessa,
+        giornate: payload.giornate.map((g) => ({
+          giorno: dayToTimestamp(g.giorno),
+          ore: Number(g.ore),
+          nota: g.nota,
+        })),
+      }),
+    });
+  } catch (e) {
+    console.error("addTimeEntriesByDays: fetch fallita", e);
     throw new Error(
       "Impossibile raggiungere il server. Controlla la connessione.",
     );

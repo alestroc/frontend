@@ -38,7 +38,7 @@ export default function LoginPage({
   }
 
   return (
-    <div className="flex flex-col w-[30%] h-[50%] items-center justify-center border rounded-md">
+    <div className="flex flex-col w-[30%] h-[55vh] items-center justify-center border rounded-md">
       <div className="flex items-center gap-3 px-8 py-6">
         <img src={logo} alt="Studium logo" className="h-9 w-auto" />
         <span

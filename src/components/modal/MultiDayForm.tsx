@@ -17,8 +17,10 @@ import {
   DEFAULT_MIN_HOURS,
 } from "../../config";
 import { inputClass } from "../../functions/config";
+import ConfirmDialog from "./ConfirmDialog";
+import SwitchButton from "./SwitchButton";
 
-interface MultiDayFormProps {
+export interface MultiDayFormProps {
   entries: TimeEntry[];
   settings: ApiSettings | null;
   commesse: Commessa[];
@@ -28,8 +30,8 @@ interface MultiDayFormProps {
   onSaved?: () => void;
   onClose: () => void;
   showError?: (message: string) => void;
+  setissingleDay: (value: boolean) => void;
 }
-
 export default function MultiDayForm({
   entries,
   settings,
@@ -40,20 +42,12 @@ export default function MultiDayForm({
   onSaved,
   onClose,
   showError,
+  setIsSingleDayMode,
 }: MultiDayFormProps) {
   const [selectedDays, setSelectedDays] = useState<string[]>([]);
-  const [dayInputs, setDayInputs] = useState<
-    Record<string, { ore: string; nota: string }>
-  >({});
+  const [showConfirm, setShowConfirm] = useState<boolean>(false);
 
   const entriesByDay = useEntriesByDay(entries);
-
-  function updateDayInput(
-    day: string,
-    patch: Partial<{ ore: string; nota: string }>,
-  ) {
-    setDayInputs((prev) => ({ ...prev, [day]: { ...prev[day], ...patch } }));
-  }
 
   // Toggle: rimuove il giorno se già presente, altrimenti lo aggiunge
   function toggleDay(key: string) {
@@ -81,36 +75,32 @@ export default function MultiDayForm({
 
   const form = useMultiDayEntryForm({
     selectedDays: selectedDays.length ? selectedDays : null,
-    existingHours: 0,
+    entriesByDay,
     commesse,
     articoli,
     maxHours,
     onSaved,
-    entries,
   });
 
   async function handleConfirm() {
-    const commessa = {
-      idarticolo: form.row.idarticolo,
-      nomearticolo:
-        articoliOptions.find((o) => o.id === form.row.idarticolo) ?? null,
-      idcommessa: form.row.idcommessa,
-      nomecommessa:
-        commesseOptions.find((o) => o.id === form.row.idcommessa) ?? null,
-    };
-    const giornate = selectedDays.map((e) => {
-      const stringToUnix = Date.parse(e);
+    form.setFormError(null);
+    const err = form.validate();
+    if (err) {
+      form.setFormError(err);
+      return;
+    }
+    setShowConfirm(true);
+  }
 
-      if (dayInputs[e]) {
-        return {
-          giorno: stringToUnix,
-          ore: dayInputs[e].ore,
-          nota: dayInputs[e].nota,
-        };
-      }
-    });
-    console.log(commessa, giornate);
-    // chiamata alla API a cui passo commessa e giornate
+  async function handleConfirmSave() {
+    try {
+      await form.save();
+      onClose();
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : "Errore nel salvataggio.";
+      showError?.(msg);
+      setShowConfirm(false);
+    }
   }
 
   return (
@@ -118,18 +108,13 @@ export default function MultiDayForm({
       <h2 className="px-6 pt-5 text-xl font-semibold ">Inserimento Multiplo</h2>
 
       <div className="flex flex-col gap-3 p-4 ">
-        <div className="flex gap-2 text-xs font-semibold uppercase tracking-wide text-white">
-          <div className="flex-4">Commessa</div>
-          <div className="flex-2">Articolo</div>
-          <div className="w-8" />
-        </div>
         <EntryRowEditor
           row={form.row}
           commesseOptions={commesseOptions}
           articoliOptions={articoliOptions}
           hoursConfig={hoursConfig}
-          onUpdate={(patch) => form.updateRow({ ...form.row, ...patch })}
-          isMultiDay={true}
+          onUpdate={form.updateRow}
+          isSingleDay={false}
         />
       </div>
 
@@ -154,6 +139,14 @@ export default function MultiDayForm({
       </div>
 
       <div className="border-t border-slate-200 px-4 py-4 text-white text-sm">
+        {form.formError && (
+          <p
+            role="alert"
+            className="mx-4 mb-10 text-sm font-medium text-red-700 bg-red-50 border border-red-200 rounded-md px-3 py-2"
+          >
+            {form.formError}
+          </p>
+        )}
         <div className="flex">
           <div className=" flex flex-1">Giorno</div>
           <div className=" flex flex-3">Ore</div>
@@ -164,24 +157,26 @@ export default function MultiDayForm({
             (sum, e) => sum + Number(e.ore),
             0,
           );
-          const available = maxHours - registeredHours;
+          const availableHours = maxHours - registeredHours;
+          const dayLabel = day.slice(5).split("-").reverse().join("-");
           return (
             <>
               <div
                 key={day}
                 className="flex justify-between items-center gap-2"
               >
-                <p> {day.slice(5).split("-").reverse().join("-")}</p>
+                <p> {dayLabel}</p>
                 <div className="flex flex-1 gap-2 m-2 align">
                   <input
                     type="number"
                     placeholder="Ore"
+                    aria-label={`Ore per il ${dayLabel}`}
                     step={hoursConfig.step}
                     min={hoursConfig.min}
-                    max={available}
-                    value={dayInputs[day]?.ore ?? ""}
+                    max={availableHours}
+                    value={form.dayInputs[day]?.ore ?? ""}
                     onChange={(e) => {
-                      updateDayInput(day, { ore: e.currentTarget.value });
+                      form.updateDayInput(day, { ore: e.currentTarget.value });
                     }}
                     className={[inputClass, "appearance-textfield"].join(" ")}
                   />
@@ -190,51 +185,58 @@ export default function MultiDayForm({
                   <input
                     type="text"
                     placeholder="Nota"
-                    value={dayInputs[day]?.nota ?? ""}
+                    aria-label={`Nota per il ${dayLabel}`}
+                    value={form.dayInputs[day]?.nota ?? ""}
                     onChange={(e) => {
-                      updateDayInput(day, { nota: e.currentTarget.value });
+                      form.updateDayInput(day, { nota: e.currentTarget.value });
                     }}
                     className={[inputClass, "overflow-hidden m-2"].join(" ")}
                   />
                 </div>
-                <p className="text-xs text-slate-300 align-center">
-                  {available}h disponibili
+                <p className="flex flex-1 text-xs text-slate-300 align-center">
+                  {availableHours}h disponibili
                 </p>
-
-                {/* 
-              raccogliere i dati per chiamare la funzione per l'inserimento di multi mansioni
-              check API di Marco
-              rifare il layout 
-              */}
               </div>
             </>
           );
         })}
       </div>
 
-      {form.formError && (
-        <p className="mx-4 text-sm font-medium text-red-700 bg-red-50 border border-red-200 rounded-md px-3 py-2">
-          {form.formError}
-        </p>
+      {showConfirm && (
+        <ConfirmDialog
+          title="Confermi l'inserimento?"
+          message={
+            <>
+              Confermi l'inserimento di
+              <strong> {selectedDays.length} commesse</strong> ?
+            </>
+          }
+          onConfirm={handleConfirmSave}
+          onCancel={() => setShowConfirm(false)}
+          isLoading={form.isSaving}
+        />
       )}
 
-      <div className="sticky bottom-0 flex bg-slate-600 border-t border-slate-200 justify-end w-full p-3 gap-2">
-        <button
-          onClick={() => {
-            handleConfirm();
-          }}
-          disabled={form.isSaving || selectedDays.length === 0}
-          className="px-4 py-2 rounded-md bg-blue-600 text-white font-medium hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-        >
-          Conferma
-        </button>
-        <button
-          onClick={onClose}
-          disabled={form.isSaving}
-          className="px-4 py-2 rounded-md border border-slate-300 bg-white text-slate-700 font-medium hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:opacity-50 transition-colors"
-        >
-          Annulla
-        </button>
+      <div className="sticky bottom-0 flex p-2 bg-slate-600 border-t border-slate-200 justify-between w-full">
+        <SwitchButton setIsSingleDayMode={setIsSingleDayMode} />
+        <div className="flex gap-3">
+          <button
+            onClick={() => {
+              handleConfirm();
+            }}
+            disabled={form.isSaving || selectedDays.length === 0}
+            className="px-4 py-2 rounded-md bg-blue-600 text-white font-medium hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            Conferma
+          </button>
+          <button
+            onClick={onClose}
+            disabled={form.isSaving}
+            className="px-4 py-2 rounded-md border border-slate-300 bg-white text-slate-700 font-medium hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:opacity-50 transition-colors"
+          >
+            Annulla
+          </button>
+        </div>
       </div>
     </>
   );

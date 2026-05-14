@@ -78,6 +78,7 @@ export default function Calendar({
         disabled={isDisabled(date)}
         isModal={isModal}
         view={view}
+        settings={settings ? settings : null}
         onClick={() => handleClickDay?.(key)}
       />
     );
