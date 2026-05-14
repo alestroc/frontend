@@ -16,10 +16,13 @@ export default function Favorites({
   reloadFavorites,
   autocompleteFavorite,
 }: FavoritesProps) {
+  // riordina i favorites prima di inizializzare lo stato
   const [favorites, setFavorites] = useState<ProcessedFavorite[]>(() =>
     [...initialFavorites].sort((a, b) => a.order_no - b.order_no),
   );
+
   const [prevInitial, setPrevInitial] = useState(initialFavorites);
+
   if (initialFavorites !== prevInitial) {
     setPrevInitial(initialFavorites);
     setFavorites([...initialFavorites].sort((a, b) => a.order_no - b.order_no));

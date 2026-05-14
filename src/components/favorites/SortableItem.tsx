@@ -61,22 +61,25 @@ export default function SortableItem({
         onPointerDown={(e) => e.stopPropagation()}
         className="w-5 shrink-0 hover:bg-red-100 rounded-full"
         disabled={isButtonDisabled}
+        aria-label={`Elimina preferito ${favorite.nomecommessa}`}
         onClick={() => {
           setisButtonDisabled((prev) => !prev);
           handleDelete();
         }}
       >
-        <DeleteIcon fontSize="small" />
+        <DeleteIcon fontSize="small" aria-hidden="true" />
       </button>
       <span
         ref={handleRef}
+        role="button"
         title="Trascina per riordinare"
+        aria-label={`Riordina preferito ${favorite.nomecommessa}`}
         className={[
           "flex items-center justify-center px-1 text-slate-500 hover:text-slate-900 select-none",
           isDragging ? "cursor-grabbing" : "cursor-grab",
         ].join(" ")}
       >
-        <DragIndicatorIcon fontSize="small" />
+        <DragIndicatorIcon fontSize="small" aria-hidden="true" />
       </span>
     </div>
   );

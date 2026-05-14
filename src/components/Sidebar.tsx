@@ -35,14 +35,14 @@ export default function Sidebar({
         ) : (
           <div className="flex items-center gap-3 px-2 py-2">
             <img src={logo} alt="Studium logo" className="h-7 w-auto" />
-            <span
-              className="text-slate-100 text-xl font-light uppercase tracking-widest"
+            <h2
+              className="text-slate-100 font-light uppercase tracking-widest"
               style={{
                 fontFamily: "Century Gothic",
               }}
             >
               studium
-            </span>
+            </h2>
           </div>
         )}
 

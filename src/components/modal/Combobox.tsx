@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { COMBOBOX_MAX_VISIBLE } from "../../config";
 
 export interface ComboboxOption {
@@ -17,8 +17,12 @@ export default function Combobox({
   options,
   value,
   onChange,
+  placeholder = "Cerca",
   label,
 }: ComboboxProps) {
+  // Id univoci per collegare input ↔ listbox ↔ option
+  const listboxId = useId();
+  const optionIdPrefix = useId();
   const [query, setQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(0);
@@ -97,8 +101,18 @@ export default function Combobox({
       )}
       <input
         type="text"
+        role="combobox"
+        aria-label={label ?? placeholder}
+        aria-expanded={isOpen}
+        aria-controls={listboxId}
+        aria-autocomplete="list"
+        aria-activedescendant={
+          isOpen && visibleOptions[highlightedIndex]
+            ? `${optionIdPrefix}-${visibleOptions[highlightedIndex].id}`
+            : undefined
+        }
         className="w-full rounded-md px-3 py-2 bg-white text-slate-900 border border-slate-300 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-colors"
-        placeholder="Cerca"
+        placeholder={placeholder}
         value={displayValue}
         onFocus={() => {
           setQuery(selectedOption?.label ?? "");
@@ -115,6 +129,8 @@ export default function Combobox({
       {isOpen && (
         <ul
           ref={listRef}
+          id={listboxId}
+          role="listbox"
           className="absolute flex flex-col z-10 mt-10 w-full max-h-48 overflow-auto bg-white border border-slate-200 rounded-md shadow-lg"
         >
           {visibleOptions.length === 0 ? (
@@ -126,6 +142,9 @@ export default function Combobox({
               {visibleOptions.map((option, i) => (
                 <li
                   key={option.id}
+                  id={`${optionIdPrefix}-${option.id}`}
+                  role="option"
+                  aria-selected={option.id === value}
                   onClick={() => selectOption(option)}
                   onMouseEnter={() => setHighlightedIndex(i)}
                   className={[

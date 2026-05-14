@@ -16,16 +16,26 @@ export default function CalendarNav({
 }: CalendarNavProps) {
   return (
     <div className="shrink-0 flex items-center gap-2 mb-2">
-      <button onClick={onPrev} className={`${navBtn} text-lg`}>
-        ‹
+      <button
+        type="button"
+        onClick={onPrev}
+        aria-label="Periodo precedente"
+        className={`${navBtn} text-lg`}
+      >
+        <span aria-hidden="true">‹</span>
       </button>
       <span className="font-semibold text-md text-center w-72 truncate text-slate-100">
         {label}
       </span>
-      <button onClick={onNext} className={`${navBtn} text-lg`}>
-        ›
+      <button
+        type="button"
+        onClick={onNext}
+        aria-label="Periodo successivo"
+        className={`${navBtn} text-lg`}
+      >
+        <span aria-hidden="true">›</span>
       </button>
-      <button onClick={onToday} className={`${navBtn} text-sm`}>
+      <button type="button" onClick={onToday} className={`${navBtn} text-sm`}>
         Oggi
       </button>
     </div>

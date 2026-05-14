@@ -202,7 +202,10 @@ function App() {
               {sideBarItems.map(({ label, Icon }) => (
                 <button
                   key={label}
-                  title={label}
+                  type="button"
+                  aria-label={collapsed ? label : undefined}
+                  title={collapsed ? label : undefined}
+                  aria-current={view === label ? "page" : undefined}
                   className={[
                     sideBarStyle.button.default,
                     label === sideBarItems[0].label
@@ -213,21 +216,26 @@ function App() {
                   ].join(" ")}
                   onClick={() => handleSidebar(label)}
                 >
-                  <Icon className={!collapsed ? sideBarStyle.icon : ""} />
+                  <Icon
+                    aria-hidden="true"
+                    className={!collapsed ? sideBarStyle.icon : ""}
+                  />
                   {!collapsed && label}
                 </button>
               ))}
             </div>
           </Sidebar>
-          <Calendar
-            entries={entries}
-            settings={settings}
-            view={view}
-            handleClickDay={(e) => {
-              setSelectedDay(e);
-              setIsModalActive(true);
-            }}
-          />
+          <main className="flex-1 min-w-0 overflow-auto">
+            <Calendar
+              entries={entries}
+              settings={settings}
+              view={view}
+              handleClickDay={(e) => {
+                setSelectedDay(e);
+                setIsModalActive(true);
+              }}
+            />
+          </main>
         </div>
       )}
       {error && (
