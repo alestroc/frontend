@@ -98,6 +98,56 @@ export async function addTimeEntries(
   }
 }
 
+// Scarica un file .xlsx con le entries nel range indicato.
+// Triggera il download nel browser tramite blob + link nascosto.
+export async function exportTimeEntries(
+  fromDate: string, // "YYYY-MM-DD"
+  toDate: string, // "YYYY-MM-DD"
+  commessa?: string,
+): Promise<void> {
+  const localData = readLocalData();
+  if (!localData) {
+    throw new Error("Sessione non trovata. Effettua il login.");
+  }
+
+  let response: Response;
+  try {
+    response = await fetch(`${BASE_URL}/exportTimeEntries`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${localData.token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        user: localData.user,
+        localid: localData.localid,
+        from_date: fromDate,
+        to_date: toDate,
+        commessa,
+      }),
+    });
+  } catch (e) {
+    console.error("exportTimeEntries: fetch fallita", e);
+    throw new Error(
+      "Impossibile raggiungere il server. Controlla la connessione.",
+    );
+  }
+
+  if (!response.ok) {
+    throw new Error("Errore durante il download del report.");
+  }
+
+  const blob = await response.blob();
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `rapportini_${fromDate}_${toDate}.xlsx`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
 export async function addTimeEntriesByDays(
   payload: AddTimeEntriesByDaysPayload,
 ): Promise<void> {
