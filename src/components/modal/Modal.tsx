@@ -34,8 +34,8 @@ function Modal({
   showError,
   reloadFavorites,
 }: ModalProp) {
-  // true → multi-mansione su singolo giorno
-  // false → singola mansione su più giorni
+  // true → x commesse per singolo giorno
+  // false → x giorni per commessa singola
   const [isSingleDayMode, setIsSingleDayMode] = useState(true);
 
   const onClose = () => isModalActive(false);
@@ -50,26 +50,20 @@ function Modal({
     onSaved,
     onClose,
     showError,
+    setIsSingleDayMode,
   };
 
   return (
-    <div className="flex flex-col justify-between align-middle z-99 absolute w-[80%] h-[80%] self-center mx-[10%] bg-slate-700 rounded-lg shadow-2xl overflow-auto">
-      <div className="flex justify-end px-4 pt-3">
-        <button
-          type="button"
-          onClick={() => setIsSingleDayMode((prev) => !prev)}
-          className="px-3 py-1.5 rounded-md border border-slate-300 bg-slate-500 text-sm font-medium text-white hover:bg-slate-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-        >
-          Cambia modalità
-        </button>
+    <>
+      <div className="flex flex-col gap-3 align-middle z-99 absolute w-[60%] h-[90%] self-center mx-[25%] bg-slate-700 rounded-lg shadow-2xl overflow-auto ">
+        {isSingleDayMode ? (
+          <SingleDayForm {...sharedProps} initialSelectedDay={selectedDay} />
+        ) : (
+          <MultiDayForm {...sharedProps} />
+        )}
       </div>
-
-      {isSingleDayMode ? (
-        <SingleDayForm {...sharedProps} initialSelectedDay={selectedDay} />
-      ) : (
-        <MultiDayForm {...sharedProps} />
-      )}
-    </div>
+      <div className=" bg-slate-600 opacity-50 w-full h-full absolute z-9"></div>
+    </>
   );
 }
 

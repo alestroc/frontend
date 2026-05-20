@@ -30,7 +30,7 @@ export interface MultiDayFormProps {
   onSaved?: () => void;
   onClose: () => void;
   showError?: (message: string) => void;
-  setissingleDay: (value: boolean) => void;
+  setIsSingleDayMode: React.Dispatch<React.SetStateAction<boolean>>;
 }
 export default function MultiDayForm({
   entries,
@@ -107,7 +107,7 @@ export default function MultiDayForm({
     <>
       <h2 className="px-6 pt-5 text-xl font-semibold ">Inserimento Multiplo</h2>
 
-      <div className="flex flex-col gap-3 p-4 ">
+      <div className="flex flex-col p-2 ">
         <EntryRowEditor
           row={form.row}
           commesseOptions={commesseOptions}
@@ -147,11 +147,7 @@ export default function MultiDayForm({
             {form.formError}
           </p>
         )}
-        <div className="flex">
-          <div className=" flex flex-1">Giorno</div>
-          <div className=" flex flex-3">Ore</div>
-          <div className=" flex flex-3">Nota</div>
-        </div>
+
         {selectedDays.map((day) => {
           const registeredHours = (entriesByDay[day] ?? []).reduce(
             (sum, e) => sum + Number(e.ore),
@@ -161,10 +157,7 @@ export default function MultiDayForm({
           const dayLabel = day.slice(5).split("-").reverse().join("-");
           return (
             <>
-              <div
-                key={day}
-                className="flex justify-between items-center gap-2"
-              >
+              <div key={day} className="flex justify-between items-center">
                 <p> {dayLabel}</p>
                 <div className="flex flex-1 gap-2 m-2 align">
                   <input
@@ -217,7 +210,7 @@ export default function MultiDayForm({
         />
       )}
 
-      <div className="sticky bottom-0 flex p-2 bg-slate-600 border-t border-slate-200 justify-between w-full">
+      <div className="mt-auto sticky bottom-0 flex p-2 bg-slate-600 border-t border-slate-200 justify-between w-full">
         <SwitchButton setIsSingleDayMode={setIsSingleDayMode} />
         <div className="flex gap-3">
           <button

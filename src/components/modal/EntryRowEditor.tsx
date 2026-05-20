@@ -1,6 +1,7 @@
 import { inputClass } from "../../functions/config";
 import Combobox, { type ComboboxOption } from "./Combobox";
 import ClearIcon from "@mui/icons-material/Clear";
+import AddIcon from "@mui/icons-material/Add";
 
 export type EntryRow = {
   rowId: string;
@@ -17,8 +18,8 @@ interface EntryRowEditorProps {
   hoursConfig: { min: number; max: number; step: number };
   onUpdate: (patch: Partial<EntryRow>) => void;
   onRemove?: () => void;
+  onAdd?: () => void;
   // true -> mostra anche ore + nota (usata in SingleDayForm).
-  // false -> mostra solo commessa + articolo (la mansione è una sola, usato in MultiDayEntries).
   isSingleDay: boolean;
 }
 
@@ -29,6 +30,7 @@ export default function EntryRowEditor({
   hoursConfig,
   onUpdate,
   onRemove,
+  onAdd,
   isSingleDay,
 }: EntryRowEditorProps) {
   return (
@@ -60,7 +62,7 @@ export default function EntryRowEditor({
               max={hoursConfig.max}
               value={row.ore}
               onChange={(e) => onUpdate({ ore: e.target.value })}
-              className={[inputClass, "appearance-textfield"].join(" ")}
+              className={[inputClass, " appearance-textfield"].join(" ")}
             />
           </div>
           <div className="flex-5 overflow-auto">
@@ -72,20 +74,33 @@ export default function EntryRowEditor({
               className={[inputClass, "overflow-hidden"].join(" ")}
             />
           </div>
+          {onRemove ? (
+            <div className="w-6 flex text-center bg-slate-800 rounded-full items-center justify-center">
+              <button
+                type="button"
+                title="Rimuovi riga"
+                aria-label="Rimuovi riga"
+                onClick={onRemove}
+                className="text-slate-400 hover:text-red-600 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 rounded"
+              >
+                <ClearIcon />
+              </button>
+            </div>
+          ) : onAdd ? (
+            <div className="w-6 flex text-center items-center rounded-full bg-slate-800 justify-center">
+              <button
+                type="button"
+                title="Aggiungi nuova riga"
+                aria-label="Aggiungi nuova riga"
+                onClick={onAdd}
+                className="text-slate-400 hover:text-blue-600 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded"
+              >
+                <AddIcon />
+              </button>
+            </div>
+          ) : null}
         </>
       )}
-      <div className="w-8 flex items-center justify-center">
-        {onRemove && (
-          <button
-            type="button"
-            title="Rimuovi riga"
-            onClick={onRemove}
-            className="text-slate-400 hover:text-red-600 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 rounded"
-          >
-            <ClearIcon />
-          </button>
-        )}
-      </div>
     </div>
   );
 }

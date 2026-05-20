@@ -19,6 +19,7 @@ import {
   DEFAULT_MIN_HOURS,
 } from "../../config";
 import { addFavorite } from "../../functions/favorites";
+import SwitchButton from "./SwitchButton";
 
 interface SingleDayFormProps {
   entries: TimeEntry[];
@@ -31,6 +32,7 @@ interface SingleDayFormProps {
   onSaved?: () => void;
   onClose: () => void;
   showError?: (message: string) => void;
+  setIsSingleDayMode: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export default function SingleDayForm({
@@ -44,6 +46,7 @@ export default function SingleDayForm({
   onSaved,
   onClose,
   showError,
+  setIsSingleDayMode,
 }: SingleDayFormProps) {
   const [selectedDay, setSelectedDay] = useState<string | null>(
     initialSelectedDay,
@@ -107,17 +110,16 @@ export default function SingleDayForm({
 
   return (
     <>
-      <h2 className="px-6 pt-5 text-xl font-semibold text-red-500">
-        Inserimento Singolo
-      </h2>
-      <h4 className="px-6 pb-4 text-sm font-medium text-white">
-        Giorno selezionato:{" "}
-        <span className="text-white font-semibold">
-          {selectedDay?.split("-").reverse().join("-") ?? "nessuno"}
-        </span>
-      </h4>
-      <div className="flex justify-between gap-3 min-h-35 px-4">
+      <h2 className="pt-5 text-xl font-semibold ">Inserimento Singolo</h2>
+
+      <div className="flex justify-between h-55 shrink-0 gap-2 min-h-35 px-4">
         <div className="flex-1 rounded-md border border-slate-200 bg-slate-900 overflow-hidden">
+          <h4 className="px-6 my-2 text-sm font-medium text-white">
+            Giorno selezionato:{" "}
+            <span className="text-white font-semibold">
+              {selectedDay?.split("-").reverse().join("-") ?? "nessuno"}
+            </span>
+          </h4>
           <Calendar
             entries={entries}
             settings={settings}
@@ -136,13 +138,11 @@ export default function SingleDayForm({
         </div>
       </div>
       <div className="border-t border-slate-200 flex flex-col gap-3 px-4 py-4 mt-4">
-        <div className="flex gap-2 text-xs font-semibold uppercase tracking-wide text-white">
-          <div className="flex-4">Commessa</div>
-          <div className="flex-2">Articolo</div>
-          <div className="flex-2">Ore</div>
-          <div className="flex-5">Nota</div>
-          <div className="w-8" />
-        </div>
+        {form.formError && (
+          <p className="text-sm font-medium text-red-700 bg-red-50 border border-red-200 rounded-md px-3 py-2">
+            {form.formError}
+          </p>
+        )}
 
         {form.rows.map((r, i) => (
           <EntryRowEditor
@@ -153,23 +153,10 @@ export default function SingleDayForm({
             hoursConfig={hoursConfig}
             onUpdate={(patch) => form.updateRow(r.rowId, patch)}
             onRemove={i > 0 ? () => form.removeRow(r.rowId) : undefined}
-            isMultiDay={false}
+            onAdd={i === 0 ? form.addRow : undefined}
+            isSingleDay={true}
           />
         ))}
-
-        <button
-          type="button"
-          onClick={form.addRow}
-          className="self-start px-3 py-1.5 rounded-md border border-slate-300 bg-slate-500 text-md font-bold  hover:bg-slate-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-        >
-          +
-        </button>
-
-        {form.formError && (
-          <p className="text-sm font-medium text-red-700 bg-red-50 border border-red-200 rounded-md px-3 py-2">
-            {form.formError}
-          </p>
-        )}
       </div>
       <div className="border-t border-slate-200 flex flex-col gap-2 px-4 py-4 bg-slate-400">
         <EntryList
@@ -187,21 +174,24 @@ export default function SingleDayForm({
         />
       </div>
 
-      <div className="sticky bottom-0 flex bg-slate-600 border-t border-slate-200 justify-end w-full p-3 gap-2">
-        <button
-          onClick={handleConfirm}
-          disabled={form.isSaving}
-          className="px-4 py-2 rounded-md bg-blue-600 text-white font-medium hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-        >
-          Conferma
-        </button>
-        <button
-          onClick={onClose}
-          disabled={form.isSaving}
-          className="px-4 py-2 rounded-md border border-slate-300 bg-white text-slate-700 font-medium hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:opacity-50 transition-colors"
-        >
-          Annulla
-        </button>
+      <div className="mt-auto sticky bottom-0 flex p-2 bg-slate-600 border-t border-slate-200 justify-between w-full">
+        <SwitchButton setIsSingleDayMode={setIsSingleDayMode} />
+        <div className="flex gap-3">
+          <button
+            onClick={handleConfirm}
+            disabled={form.isSaving}
+            className="px-4 py-2 rounded-md bg-blue-600 text-white font-medium hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            Conferma
+          </button>
+          <button
+            onClick={onClose}
+            disabled={form.isSaving}
+            className="px-4 py-2 rounded-md border border-slate-300 bg-white text-slate-700 font-medium hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:opacity-50 transition-colors"
+          >
+            Annulla
+          </button>
+        </div>
       </div>
 
       {showConfirm && (
