@@ -7,8 +7,8 @@ interface DayProp {
 
 export default function DayView({ cursor, renderCell }: DayProp) {
   return (
-    <>
-      <div className="flex-1 min-h-0">{renderCell(cursor)}</div>
-    </>
+    <div className="text-center font-semibold text-white py-1 whitespace-nowrap overflow-hidden">
+      {renderCell(cursor)}
+    </div>
   );
 }

@@ -1,5 +1,4 @@
 import LoginPage from "./components/Login";
-import "./App.css";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Calendar from "./components/calendar/Calendar";
 import Sidebar from "./components/Sidebar";
@@ -15,17 +14,18 @@ import { getSettings } from "./functions/settings";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import CalendarViewWeekIcon from "@mui/icons-material/CalendarViewWeek";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
-import DownloadIcon from "@mui/icons-material/Download";
 import AssessmentIcon from "@mui/icons-material/Assessment";
 import AddTaskIcon from "@mui/icons-material/AddTask";
 import type { SvgIconComponent } from "@mui/icons-material";
 import Modal from "./components/modal/Modal";
+import Statistics from "./components/statistics/Statistics";
 import { useNeededs } from "./hooks/useNeededs";
 import { getFavorites } from "./functions/favorites";
 import { LOGIN_HINT_TTL_MS, TOAST_TTL_MS } from "./config";
 
 function App() {
   const [isLogged, setIsLogged] = useState(false);
+  const [currentPage, setCurrentPage] = useState("calendar");
   const [isLoading, setIsLoading] = useState(true);
   const [view, setView] = useState("Mensile");
   const [settings, setSettings] = useState<ApiSettings | null>(null);
@@ -66,7 +66,6 @@ function App() {
     { label: "Settimanale", Icon: CalendarViewWeekIcon },
     { label: "Giornata", Icon: CalendarTodayIcon },
     { label: "Statistiche", Icon: AssessmentIcon },
-    { label: "Scarica Report", Icon: DownloadIcon },
   ];
 
   useEffect(() => {
@@ -146,6 +145,7 @@ function App() {
       buttonValue === "Giornata"
     ) {
       setView(buttonValue);
+      setCurrentPage("calendar");
     }
 
     switch (buttonValue) {
@@ -154,10 +154,10 @@ function App() {
         setIsModalActive(true);
         break;
       case "Scarica Report":
-        console.log("Bottone Scarica Report Premuto");
+        setCurrentPage("stats");
         break;
       case "Statistiche":
-        console.log("Bottone Statistiche premuto.");
+        setCurrentPage("stats");
         break;
       case "Logout":
         deleteLocalStorageData();
@@ -173,7 +173,7 @@ function App() {
       {!isLogged ? (
         <LoginPage isLogged={setIsLogged} />
       ) : (
-        <div className="flex flex-row bg-slate-900 w-full h-full overflow-auto">
+        <div className="flex flex-row bg-slate-900 w-full h-full justify-center align-center overflow-auto">
           {isModalActive && (
             <Modal
               entries={entries}
@@ -195,46 +195,61 @@ function App() {
           >
             <div
               className={[
-                "flex flex-col gap-5 justify-between mt-5",
+                "flex flex-col gap-1.75 justify-between mt-5",
                 collapsed ? "p-1 items-center" : "p-2",
               ].join(" ")}
             >
-              {sideBarItems.map(({ label, Icon }) => (
-                <button
-                  key={label}
-                  type="button"
-                  aria-label={collapsed ? label : undefined}
-                  title={collapsed ? label : undefined}
-                  aria-current={view === label ? "page" : undefined}
-                  className={[
-                    sideBarStyle.button.default,
-                    label === sideBarItems[0].label
-                      ? sideBarStyle.button.addAttivita
-                      : "",
-                    view === label ? "bg-blue-700" : "",
-                    collapsed ? "flex items-center justify-center" : "",
-                  ].join(" ")}
-                  onClick={() => handleSidebar(label)}
-                >
-                  <Icon
-                    aria-hidden="true"
-                    className={!collapsed ? sideBarStyle.icon : ""}
-                  />
-                  {!collapsed && label}
-                </button>
-              ))}
+              {sideBarItems.map(({ label, Icon }) => {
+                const isActive =
+                  label === "Statistiche"
+                    ? currentPage === "stats"
+                    : currentPage === "calendar" && view === label;
+                return (
+                  <button
+                    key={label}
+                    type="button"
+                    aria-label={collapsed ? label : undefined}
+                    title={collapsed ? label : undefined}
+                    aria-current={isActive ? "page" : undefined}
+                    className={[
+                      sideBarStyle.button.default,
+                      label === sideBarItems[0].label
+                        ? sideBarStyle.button.addAttivita
+                        : "",
+                      isActive ? "bg-blue-700" : "",
+                      collapsed ? "flex items-center justify-center" : "",
+                    ].join(" ")}
+                    onClick={() => handleSidebar(label)}
+                  >
+                    <Icon
+                      aria-hidden="true"
+                      className={!collapsed ? sideBarStyle.icon : ""}
+                    />
+                    {!collapsed && label}
+                  </button>
+                );
+              })}
             </div>
           </Sidebar>
           <main className="flex-1 min-w-0 overflow-auto">
-            <Calendar
-              entries={entries}
-              settings={settings}
-              view={view}
-              handleClickDay={(e) => {
-                setSelectedDay(e);
-                setIsModalActive(true);
-              }}
-            />
+            {currentPage === "calendar" && (
+              <Calendar
+                entries={entries}
+                settings={settings}
+                view={view}
+                handleClickDay={(e) => {
+                  setSelectedDay(e);
+                  setIsModalActive(true);
+                }}
+              />
+            )}
+            {currentPage === "stats" && (
+              <Statistics
+                entries={entries}
+                settings={settings}
+                showError={showError}
+              />
+            )}
           </main>
         </div>
       )}
@@ -262,7 +277,7 @@ export default App;
 const sideBarStyle = {
   button: {
     default:
-      "flex items-center rounded-md px-3 py-2 w-full text-left text-slate-100 hover:bg-slate-800 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900",
+      "flex items-center rounded-md px-3 py-1 w-full text-sm text-left text-slate-100 hover:bg-slate-800 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900",
     addAttivita: " bg-blue-600 hover:bg-blue-700 text-white font-medium ",
   },
   icon: "mr-2",

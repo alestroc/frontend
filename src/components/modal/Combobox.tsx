@@ -11,14 +11,12 @@ interface ComboboxProps {
   value: string | null;
   onChange: (id: string | null) => void;
   placeholder?: string;
-  label?: string;
 }
 export default function Combobox({
   options,
   value,
   onChange,
   placeholder = "Cerca",
-  label,
 }: ComboboxProps) {
   // Id univoci per collegare input ↔ listbox ↔ option
   const listboxId = useId();
@@ -94,15 +92,10 @@ export default function Combobox({
 
   return (
     <div ref={inputArea} className="relative flex flex-row w-full">
-      {label && (
-        <label className="block text-sm font-semibold mb-1 text-slate-700">
-          {label}
-        </label>
-      )}
       <input
         type="text"
         role="combobox"
-        aria-label={label ?? placeholder}
+        aria-label={placeholder}
         aria-expanded={isOpen}
         aria-controls={listboxId}
         aria-autocomplete="list"
@@ -111,7 +104,7 @@ export default function Combobox({
             ? `${optionIdPrefix}-${visibleOptions[highlightedIndex].id}`
             : undefined
         }
-        className="w-full rounded-md px-3 py-2 bg-white text-slate-900 border border-slate-300 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-colors"
+        className="w-full rounded-md  px-3 py-2 bg-white text-slate-900 border border-slate-300 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-colors"
         placeholder={placeholder}
         value={displayValue}
         onFocus={() => {

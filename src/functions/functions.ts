@@ -1,12 +1,11 @@
 import { BASE_URL } from "./config";
-import type { LocalData, TimeEntry } from "../types";
+import type { LocalData } from "../types";
 import { readLocalData, clearLocalData } from "../storage/localData";
 import type { EntryRow } from "../components/modal/EntryRowEditor";
 
 export const checkLocalStorageData = (): LocalData | false =>
   readLocalData() ?? false;
 export const deleteLocalStorageData = clearLocalData;
-export type { LocalData };
 
 // Controlla se l'utente è loggato verificando il token sul server
 export async function checkIsLogged(): Promise<boolean> {
@@ -39,15 +38,6 @@ export async function checkIsLogged(): Promise<boolean> {
 export function dateToKey(date: Date): string {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 }
-//crea un dizionario raggruppando le entries in base al giorno
-export function groupEntries(entries: TimeEntry[]) {
-  entries.reduce<Record<string, TimeEntry[]>>((acc, entry) => {
-    if (!acc[entry.giorno]) acc[entry.giorno] = [];
-    acc[entry.giorno].push(entry);
-    return acc;
-  }, {});
-}
-
 // trova il lunedì della settimana di cui viene passato il giorno
 export function getWeekStart(date: Date): Date {
   const d = new Date(date);

@@ -5,35 +5,44 @@ interface EntryBadgeProp {
   entry: TimeEntry;
 }
 
-//Componente che mostra le commesse nella casella del calendario
 export default function EntryBadge({ entry, view }: EntryBadgeProp) {
-  function StringToNum(hour: string) {
-    const numFromString = Number(hour);
-    return numFromString;
+  const hours = Number(entry.ore);
+
+  if (view === "Giornata") {
+    return (
+      <div
+        className={[Styles.default, Styles.day].join(" ")}
+        title={`${entry.nomecommessa} — ${hours}h`}
+      >
+        <div className="flex flex-row items-baseline gap-2 wrap-break-word whitespace-normal p-0.5">
+          <span className="font-bold">{hours}h</span>
+          <span className="font-semibold">{entry.nomecommessa} -</span>
+          <span className="text-sm opacity-80">{entry.idarticolo} </span>
+          {entry.nota && (
+            <span className="text-sm italic opacity-90">- {entry.nota}</span>
+          )}
+        </div>
+      </div>
+    );
   }
 
   return (
     <div
       className={[
         Styles.default,
-        view === "Mensile"
-          ? Styles.month
-          : view === "Settimanale"
-            ? Styles.week
-            : Styles.day,
+        view === "Mensile" ? Styles.month : Styles.week,
       ].join(" ")}
-      title={`${entry.nomecommessa} — ${StringToNum(entry.ore)}h`}
+      title={`${entry.nomecommessa} — ${hours}h`}
     >
-      {StringToNum(entry.ore)}h - {entry.nomecommessa} - {entry.idarticolo} -
-      {entry.nota}
+      {hours}h - {entry.nomecommessa} - {entry.idarticolo} -{entry.nota}
     </div>
   );
 }
 
 const Styles = {
   default:
-    "bg-blue-100 text-blue-900 border border-blue-200 rounded mb-1 px-1.5 truncate ",
-  month: "text-xs min-h-4 font-medium ",
-  week: "text-sm min-h-6 max-h-10 font-medium",
-  day: "text-md rounded font-medium",
+    "bg-blue-100 text-blue-900 border border-blue-200 rounded mb-1 px-1.5 ",
+  month: "text-xs min-h-4 font-medium truncate",
+  week: "text-sm min-h-6 font-medium whitespace-normal wrap-break-word",
+  day: "text-md rounded font-medium whitespace-normal wrap-break-word",
 };

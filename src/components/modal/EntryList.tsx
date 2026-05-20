@@ -12,7 +12,7 @@ export default function EntryList({
 }: EntryListProps) {
   if (entries.length === 0) {
     return (
-      <p className="text-sm text-gray-500">
+      <p className="text-sm text-gray-700">
         Nessuna attività registrata per questo giorno.
       </p>
     );

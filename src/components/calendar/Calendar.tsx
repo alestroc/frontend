@@ -132,7 +132,7 @@ export default function Calendar({
         <MonthView cursor={cursor} renderCell={renderCell} />
       )}
       {view === "Settimanale" && (
-        <WeekView cursor={cursor} renderCell={renderCell} />
+        <WeekView cursor={cursor} renderCell={renderCell} isModal={isModal} />
       )}
       {view === "Giornata" && (
         <DayView cursor={cursor} renderCell={renderCell} />

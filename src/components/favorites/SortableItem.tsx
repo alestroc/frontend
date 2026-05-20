@@ -38,14 +38,13 @@ export default function SortableItem({
     <div
       ref={ref}
       className={[
-        "flex items-center justify-between rounded-sm m-1 p-1 text-xs font-bold bg-blue-200 text-slate-900",
+        "flex items-center justify-start rounded-sm m-1 p-1 text-xs font-bold bg-blue-200 text-slate-900",
         isDragging ? "opacity-50" : "",
       ].join(" ")}
     >
-      {/* <div className="flex" > */}
       <p
         onClick={() => autocompleteFavorite(favorite)}
-        className="flex-5 truncate self-center m-2 cursor-pointer"
+        className="flex-5 truncate text-start m-2 cursor-pointer"
       >
         {favorite.nomecommessa}
       </p>
@@ -55,7 +54,6 @@ export default function SortableItem({
       >
         {favorite.idarticolo}
       </p>
-      {/* </div> */}
       <button
         type="button"
         onPointerDown={(e) => e.stopPropagation()}
