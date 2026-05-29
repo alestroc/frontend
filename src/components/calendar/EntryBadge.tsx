@@ -32,7 +32,7 @@ export default function EntryBadge({ entry, view }: EntryBadgeProp) {
         Styles.default,
         view === "Mensile" ? Styles.month : Styles.week,
       ].join(" ")}
-      title={`${entry.nomecommessa} — ${hours}h`}
+      title={`${hours}h - ${entry.nomecommessa}`}
     >
       {hours}h - {entry.nomecommessa} - {entry.idarticolo} -{entry.nota}
     </div>

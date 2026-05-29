@@ -37,6 +37,7 @@ export default function Favorites({
         setFavorites((prev) => move(prev, event));
       }}
     >
+      Preferiti
       {favorites.map((fav, index) => (
         <SortableItem
           key={fav.id}

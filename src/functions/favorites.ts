@@ -83,6 +83,7 @@ export async function removeFavorites(id: number): Promise<void> {
       headers: {
         Authorization: `Bearer ${localData.token}`,
         "Content-Type": "application/json",
+        accept: "application/json",
       },
       body: JSON.stringify({
         user: localData.user,
