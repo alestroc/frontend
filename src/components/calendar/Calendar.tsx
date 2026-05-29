@@ -21,6 +21,8 @@ interface CalendarProps {
   selectedDays?: string[] | null;
   isModal?: boolean;
   handleClickDay?: (key: string) => void;
+  // Se passato, il CalendarNav mostra il select per cambiare vista.
+  onViewChange?: (view: string) => void;
 }
 
 export default function Calendar({
@@ -31,6 +33,7 @@ export default function Calendar({
   handleClickDay,
   selected = null,
   selectedDays = null,
+  onViewChange,
 }: CalendarProps) {
   const today = new Date();
   // cursor è il punto di riferimento per la creazione del calendario.
@@ -127,7 +130,11 @@ export default function Calendar({
         onPrev={prev}
         onNext={next}
         onToday={() => setCursor(new Date(today))}
+        view={view}
+        onViewChange={onViewChange ?? (() => {})}
+        isModal={isModal}
       />
+
       {view === "Mensile" && (
         <MonthView cursor={cursor} renderCell={renderCell} />
       )}
