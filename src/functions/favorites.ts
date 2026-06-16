@@ -1,12 +1,9 @@
 import type { Favorite, ProcessedFavorite, TimeEntry } from "../types";
-import { checkLocalStorageData } from "./functions";
+import { requireLocalData } from "../storage/localData";
 import { BASE_URL } from "./config";
 
 export async function getFavorites(): Promise<Favorite[]> {
-  const localData = checkLocalStorageData();
-  if (!localData) {
-    throw new Error("Sessione non trovata. Effettua il login. getFavorites");
-  }
+  const localData = requireLocalData();
 
   let response: Response;
   try {
@@ -45,10 +42,7 @@ export async function getFavorites(): Promise<Favorite[]> {
 }
 
 export async function addFavorite(favorite: TimeEntry): Promise<boolean> {
-  const localData = checkLocalStorageData();
-  if (!localData) {
-    throw new Error("Sessione non trovata. Effettua il login. (addFavorites)");
-  }
+  const localData = requireLocalData();
   try {
     await fetch(`${BASE_URL}/addFavorite`, {
       method: "POST",
@@ -71,10 +65,7 @@ export async function addFavorite(favorite: TimeEntry): Promise<boolean> {
 }
 
 export async function removeFavorites(id: number): Promise<void> {
-  const localData = checkLocalStorageData();
-  if (!localData) {
-    throw new Error("Sessione non trovata. Effettua il login. removeFavorites");
-  }
+  const localData = requireLocalData();
 
   let response: Response;
   try {
@@ -97,7 +88,6 @@ export async function removeFavorites(id: number): Promise<void> {
   }
 
   const data = await response.json();
-  console.log(data);
   if (!data.message) {
     throw new Error(
       "La sessione è scaduta. Effettua nuovamente il login. removeFavorites",
@@ -109,12 +99,10 @@ export async function removeFavorites(id: number): Promise<void> {
 export async function reorderFavorite(
   arrFavorites: Array<ProcessedFavorite>,
 ): Promise<void> {
-  const localData = checkLocalStorageData();
-  if (!localData) {
-    throw new Error(
-      "Sessione non trovata. Effettua il login. reorderFavorites",
-    );
-  }
+  // Early-return se la lista è vuota
+  if (arrFavorites.length === 0) return;
+
+  const localData = requireLocalData();
   const arrIdFavorites = arrFavorites.map((element) => {
     return element.id;
   });

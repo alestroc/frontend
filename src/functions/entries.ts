@@ -1,5 +1,5 @@
 import type { AddTimeEntriesByDaysPayload, TimeEntry } from "../types";
-import { readLocalData } from "../storage/localData";
+import { requireLocalData } from "../storage/localData";
 import { BASE_URL } from "./config";
 
 interface ApiResponse<T> {
@@ -8,10 +8,7 @@ interface ApiResponse<T> {
 }
 
 export async function getEntries(): Promise<TimeEntry[]> {
-  const localData = readLocalData();
-  if (!localData) {
-    throw new Error("Sessione non trovata. Effettua il login.");
-  }
+  const localData = requireLocalData();
 
   let response: Response;
   try {
@@ -64,10 +61,7 @@ export async function addTimeEntries(
   giorno: string,
   entries: NewEntry[] | NewEntry,
 ): Promise<void> {
-  const localData = readLocalData();
-  if (!localData) {
-    throw new Error("Sessione non trovata. Effettua il login.");
-  }
+  const localData = requireLocalData();
 
   let response: Response;
   try {
@@ -105,10 +99,7 @@ export async function exportTimeEntries(
   toDate: string, // "YYYY-MM-DD"
   commessa?: string,
 ): Promise<void> {
-  const localData = readLocalData();
-  if (!localData) {
-    throw new Error("Sessione non trovata. Effettua il login.");
-  }
+  const localData = requireLocalData();
 
   let response: Response;
   try {
@@ -151,10 +142,7 @@ export async function exportTimeEntries(
 export async function addTimeEntriesByDays(
   payload: AddTimeEntriesByDaysPayload,
 ): Promise<void> {
-  const localData = readLocalData();
-  if (!localData) {
-    throw new Error("Sessione non trovata. Effettua il login.");
-  }
+  const localData = requireLocalData();
 
   let response: Response;
   try {

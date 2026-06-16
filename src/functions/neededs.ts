@@ -1,5 +1,5 @@
 import type { Commessa, Articolo } from "../types";
-import { readLocalData } from "../storage/localData";
+import { requireLocalData } from "../storage/localData";
 import { BASE_URL } from "./config";
 
 interface ApiResponse {
@@ -15,10 +15,7 @@ export async function getNeededs(): Promise<{
   commesse: Commessa[];
   articoli: Articolo[];
 }> {
-  const localData = readLocalData();
-  if (!localData) {
-    throw new Error("Sessione non trovata. Effettua il login.");
-  }
+  const localData = requireLocalData();
 
   let response: Response;
   try {

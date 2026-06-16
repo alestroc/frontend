@@ -1,10 +1,7 @@
 import { BASE_URL } from "./config";
-import type { LocalData } from "../types";
 import { readLocalData, clearLocalData } from "../storage/localData";
 import type { EntryRow } from "../components/modal/EntryRowEditor";
 
-export const checkLocalStorageData = (): LocalData | false =>
-  readLocalData() ?? false;
 export const deleteLocalStorageData = clearLocalData;
 
 // Controlla se l'utente è loggato verificando il token sul server
