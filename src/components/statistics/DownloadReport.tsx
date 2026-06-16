@@ -44,13 +44,13 @@ export default function DownloadReport({
   }
 
   return (
-    <section className="rounded-md border border-slate-700 bg-slate-800 p-4">
-      <h2 className="text-lg font-semibold text-slate-100 mb-3">
+    <section className="rounded-md border border-divider bg-surface p-4">
+      <h2 className="text-lg font-semibold text-secondary mb-3">
         Scarica report
       </h2>
 
       <div className="flex flex-wrap gap-3 items-end">
-        <label className="text-sm text-slate-200">
+        <label className="text-sm text-primary">
           Dal
           <input
             type="date"
@@ -59,7 +59,7 @@ export default function DownloadReport({
             className="block mt-1 rounded-md px-3 py-2 bg-white text-slate-900 border border-slate-300"
           />
         </label>
-        <label className="text-sm text-slate-200">
+        <label className="text-sm text-primary">
           Al
           <input
             type="date"
@@ -69,7 +69,7 @@ export default function DownloadReport({
           />
         </label>
         <div className="flex-1 min-w-64">
-          <span className="block text-sm text-slate-200 mb-1">Commessa</span>
+          <span className="block text-sm text-primary mb-1">Commessa</span>
           <Combobox
             options={commesseOptions}
             value={commessa}
@@ -81,7 +81,7 @@ export default function DownloadReport({
           type="button"
           onClick={handleDownload}
           disabled={isDownloading}
-          className="px-4 py-2 rounded-md bg-blue-600 text-white font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="px-4 py-2 rounded-md bg-accent text-white font-medium hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           {isDownloading ? "Scarico..." : "Scarica Excel"}
         </button>

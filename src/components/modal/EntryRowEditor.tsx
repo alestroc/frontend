@@ -43,7 +43,7 @@ export default function EntryRowEditor({
           placeholder="Seleziona commessa"
         />
       </div>
-      <div className="flex-2">
+      <div className="flex-3">
         <Combobox
           options={articoliOptions}
           value={row.idarticolo}
@@ -53,7 +53,7 @@ export default function EntryRowEditor({
       </div>
       {isSingleDay && (
         <>
-          <div className="flex-2 ">
+          <div className="flex-1.5 ">
             <input
               type="number"
               placeholder="Ore"
@@ -65,7 +65,7 @@ export default function EntryRowEditor({
               className={[inputClass, " appearance-textfield"].join(" ")}
             />
           </div>
-          <div className="flex-5 overflow-auto">
+          <div className=" flex-5  overflow-auto">
             <input
               type="text"
               placeholder="Nota"
@@ -75,25 +75,25 @@ export default function EntryRowEditor({
             />
           </div>
           {onRemove ? (
-            <div className="w-6 flex text-center bg-slate-800 rounded-full items-center justify-center">
+            <div className="w-6 flex text-center bg-surface-raised rounded-full items-center justify-center">
               <button
                 type="button"
                 title="Rimuovi riga"
                 aria-label="Rimuovi riga"
                 onClick={onRemove}
-                className="text-slate-400 hover:text-red-600 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 rounded"
+                className="text-muted hover:text-danger transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger focus-visible:ring-offset-2 rounded"
               >
                 <ClearIcon />
               </button>
             </div>
           ) : onAdd ? (
-            <div className="w-6 flex text-center items-center rounded-full bg-slate-800 justify-center">
+            <div className="w-6 flex text-center items-center rounded-full bg-surface-raised justify-center">
               <button
                 type="button"
                 title="Aggiungi nuova riga"
                 aria-label="Aggiungi nuova riga"
                 onClick={onAdd}
-                className="text-slate-400 hover:text-blue-600 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded"
+                className="text-muted hover:text-accent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 rounded"
               >
                 <AddIcon />
               </button>

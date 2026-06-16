@@ -2,10 +2,100 @@
 
 @import "tailwindcss";
 
+/* ---------------------------------------------------------------------------
+ * PALETTE — Design tokens dell'app.
+ *
+ * I token sono organizzati in tre famiglie:
+ *
+ *   A) THEME-BOUND  cambiano in base al tema (sfondi, testo, bordi strutturali)
+ *                   → override in `.light` più in basso
+ *   B) FIXED        uguali in entrambi i temi (accent, stati, brand)
+ *                   → un bottone blu è blu sia di giorno che di notte
+ *   C) FORM-FIXED   superfici "isola" sempre chiare (input, EntryList)
+ *                   → spiccano sul fondo scuro, in tema chiaro si fondono
+ *
+ * I nomi sono SEMANTICI (a cosa serve il token) non descrittivi del colore.
+ * Es: `--color-accent` non `--color-blue`. Così aggiornare la palette
+ * significa toccare un valore qui, senza modificare i componenti.
+ *
+ * Per attivare il tema chiaro: aggiungi la classe `.light` a <html> (o <body>).
+ * --------------------------------------------------------------------------- */
+
+@theme {
+  /* ============== A) THEME-BOUND (default = tema scuro) ============== */
+
+  /* SFONDI — 4 livelli di profondità per la gerarchia visiva.
+     Mantengono i tre slate originali (900/800/700/600) come riferimento. */
+  --color-base: #0f172a;             /* sfondo principale app + sidebar */
+  --color-surface: #1e293b;          /* card statistiche, body del modale */
+  --color-surface-raised: #334155;   /* bottoni sidebar, sezioni in rilievo */
+  --color-surface-strong: #475569;   /* header/footer modale, separatori spessi */
+
+  /* TESTO — 3 livelli di gerarchia. Usati come text-primary / text-secondary / text-muted. */
+  --color-primary: #ffffff;          /* titoli, valori principali (es. "32h") */
+  --color-secondary: #e2e8f0;        /* corpo testo standard, label normali */
+  --color-muted: #94a3b8;            /* hint, percentuali, testo di servizio */
+
+  /* BORDI — 2 livelli di intensità. Usati come border-divider / border-divider-soft. */
+  --color-divider: #334155;          /* bordo card, contenitori principali */
+  --color-divider-soft: #1e293b;     /* divider discreti, separatori leggeri */
+
+  /* ============== B) FIXED (identici in entrambi i temi) ============== */
+
+  /* ACCENT — identità del brand, call-to-action. */
+  --color-accent: #2563eb;           /* bottoni primari (Conferma, Aggiungi Attività) */
+  --color-accent-hover: #1d4ed8;     /* stato hover dei bottoni primari */
+  --color-accent-soft: #60a5fa;      /* evidenziazione "giorno di oggi" nel calendario */
+
+  /* STATI SEMANTICI — feedback visivo all'utente. */
+  --color-success: #10b981;          /* target raggiunto, ore complete (barre/badge) */
+  --color-warning: #eab308;          /* progresso parziale (es. 50–90% nel ProgressGoal) */
+  --color-danger: #ef4444;           /* toast errori, footer "non raggiunto" calendario */
+  --color-danger-soft: #f87171;      /* varianti più tenui di danger (sfondi celle) */
+  --color-danger-strong: #dc2626;    /* azioni critiche / distruttive (es. Logout) */
+
+  /* BRAND PUNTUALE — colori usati in punti specifici dell'UI. */
+  --color-favorite: #facc15;         /* stella attiva nei preferiti (giallo) */
+
+  /* ============== C) FORM-FIXED (sempre chiari) ============== */
+
+  /* Superfici dei controlli di input + EntryList.
+     Restano "isole chiare" anche in tema scuro per dare contrasto e leggibilità.
+     Per testo/bordi DENTRO i form usa direttamente slate-900/slate-500/slate-300
+     (non hanno bisogno di tokenizzazione: il fondo bianco è sempre bianco). */
+  --color-form: #ffffff;             /* sfondo input (combobox, date, text) */
+  --color-form-elevated: #f8fafc;    /* container EntryList, Favorites */
+}
+
+/* ---------------------------------------------------------------------------
+ * OVERRIDE TEMA CHIARO
+ * Si attiva aggiungendo la classe `.light` su <html>.
+ * Tocca SOLO i token della famiglia A (theme-bound).
+ * I token B (accent/stati) e C (form) restano invariati come definiti sopra.
+ * --------------------------------------------------------------------------- */
+
+.light {
+  /* Sfondi — gerarchia 4 livelli, dal più chiaro al più scuro.
+     Saturazione +50% rispetto alla versione precedente, restando chiari. */
+   --color-base: #dbeefc;        /*     sfondo app, azzurro chiaro evidente */
+  --color-surface: #b8dff8;          /* b8dfc8 card, azzurro più "vivo" */
+  --color-surface-raised: #8fcbed;   /* caselle selezionabili, ben distinte */
+  --color-surface-strong: #6ecafb;   /*  5fb0db caselle disabilitate / header, azzurro pieno */
+
+  /* Testo — slate scuri per alto contrasto sul fondo azzurro */
+  --color-primary: #0f172a;
+  --color-secondary: #334155;
+  --color-muted: #475569;             /* più scuro per essere leggibile sui surface saturi */
+
+  /* Bordi — blu più saturi che stagliano le card */
+  --color-divider: #96c5ff;
+  --color-divider-soft: #93c5fd;
+}
+
 :root {
   --text: white;
   --text-h: #f3f4f6;
-  --bg: #0f172a; 
+  --bg: #0f172a;
   --border: #2e303a;
   --code-bg: #1f2028;
   --accent: #c084fc;
@@ -21,9 +111,9 @@
 
   font: 18px/145% var(--sans);
   letter-spacing: 0.18px;
-  color-scheme: dark;
-  color: var(--text);
-  background: var(--bg);
+  color-scheme: dark light;
+  color: var(--color-primary);
+  background: var(--color-base);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -52,10 +142,11 @@ h1,
 h2 {
   font-family: var(--heading);
   font-weight: 500;
-  color: var(--text-h);
 }
 
-h1 {
+
+ h1 {
+  
   font-size: 56px;
   letter-spacing: -1.68px;
   margin: 32px 0;
@@ -65,6 +156,7 @@ h1 {
   }
 }
 h2 {
+  padding: 25px;
   font-size: 24px;
   line-height: 118%;
   letter-spacing: -0.24px;
@@ -72,10 +164,7 @@ h2 {
   @media (max-width: 1024px) {
     font-size: 20px;
   }
-}
-p {
-  margin: 0;
-}
+} 
 
 code,
 .counter {

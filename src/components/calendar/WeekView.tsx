@@ -31,7 +31,7 @@ export default function WeekView({
         <div
           key={dateToKey(d)}
           className={[
-            "text-center font-semibold text-white py-1 whitespace-nowrap overflow-hidden",
+            "text-center font-semibold text-primary py-1 whitespace-nowrap overflow-hidden",
             isModal ? "text-[11px]" : "text-sm",
           ].join(" ")}
         >

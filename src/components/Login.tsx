@@ -1,5 +1,5 @@
 import { useState, type Dispatch, type SetStateAction } from "react";
-import logo from "../assets/logo.svg";
+import Logo from "./Logo";
 import { BASE_URL } from "../functions/config";
 import { writeLocalData } from "../storage/localData";
 
@@ -8,8 +8,8 @@ export default function LoginPage({
 }: {
   isLogged: Dispatch<SetStateAction<boolean>>;
 }) {
-  const [email, setEmail] = useState("testts@studium.it");
-  const [password, setPassword] = useState("Studium2026!");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -18,7 +18,6 @@ export default function LoginPage({
       setError("Inserisci email e password.");
       return;
     }
-
     try {
       const response = await fetch(`${BASE_URL}/login`, {
         method: "POST",
@@ -38,31 +37,23 @@ export default function LoginPage({
   }
 
   return (
-    <div className="flex flex-col w-[30%] h-[55vh] items-center justify-center border rounded-md">
-      <div className="flex items-center gap-3 px-8 py-6">
-        <img src={logo} alt="Studium logo" className="h-9 w-auto" />
-        <span
-          className="text-white text-2xl font-light tracking-[0.22em] uppercase"
-          style={{
-            fontFamily: "Century Gothic",
-          }}
-        >
-          studium
-        </span>
+    <div className="flex flex-col w-[30%] h-[55vh] items-center justify-center border border-divider rounded-md bg-base">
+      <div className="flex items-center justify-center px-8 py-6 text-primary">
+        <Logo className="h-12 w-auto" />
       </div>
 
-      <div className="flex w-full h-full items-center justify-center rounded-md bg-[#272b3f]">
-        <form onSubmit={handleSubmit}>
-          <div className="flex flex-col gap-2">
+      <div className="flex w-full h-full items-center justify-center rounded-md bg-surface text-primary">
+        <div className="flex flex-col w-[75%]">
+          <form onSubmit={handleSubmit}>
             <h3>Email</h3>
             <input
               id="email"
               type="email"
               autoComplete="email"
-              placeholder="email@dominio.it"
+              placeholder="email@studium.it"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-lg px-4 py-2.5 text-sm outline-none border border-gray-300 bg-gray-50 text-gray-900 transition focus:border-orange-500"
+              className="w-full rounded-lg px-4 py-2.5 text-sm outline-none border mt-3 mb-3 border-gray-300 bg-gray-50 text-gray-900 transition focus:border-orange-500"
             />
             <h3>Password</h3>
             <input
@@ -72,18 +63,18 @@ export default function LoginPage({
               placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-lg px-4 py-2.5 text-sm outline-none border border-gray-300 bg-gray-50 text-gray-900 transition focus:border-orange-500"
+              className="w-full rounded-lg px-4 py-2.5 text-sm outline-none border  mt-3 mb-3 border-gray-300 bg-gray-50 text-gray-900 transition focus:border-orange-500"
             />
-            {error && <p className="text-xs text-red-600">{error}</p>}
-          </div>
+            {error && <p className="text-xs text-danger">{error}</p>}
 
-          <button
-            type="submit"
-            className="mt-4 w-full py-2.5 text-sm font-bold text-white rounded-full bg-orange-600 hover:bg-orange-800 transition"
-          >
-            Accedi
-          </button>
-        </form>
+            <button
+              type="submit"
+              className="mt-4 w-full py-2.5 text-sm font-bold text-white rounded-full bg-orange-600 hover:bg-orange-800 transition"
+            >
+              Accedi
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );

@@ -11,17 +11,16 @@ import {
 } from "./functions/functions";
 import { getEntries } from "./functions/entries";
 import { getSettings } from "./functions/settings";
-import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
-import CalendarViewWeekIcon from "@mui/icons-material/CalendarViewWeek";
-import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import AssessmentIcon from "@mui/icons-material/Assessment";
 import AddTaskIcon from "@mui/icons-material/AddTask";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import type { SvgIconComponent } from "@mui/icons-material";
 import Modal from "./components/modal/Modal";
 import Statistics from "./components/statistics/Statistics";
 import { useNeededs } from "./hooks/useNeededs";
 import { getFavorites } from "./functions/favorites";
 import { LOGIN_HINT_TTL_MS, TOAST_TTL_MS } from "./config";
+import { readLocalData } from "./storage/localData";
 
 function App() {
   const [isLogged, setIsLogged] = useState(false);
@@ -34,7 +33,7 @@ function App() {
   const [isModalActive, setIsModalActive] = useState(false);
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
   const [collapsed, setCollapsed] = useState(false);
-  // i favorites che arrivano dal backend non hanno nomecommessa
+  // i favorites che arrivano dal backend non hanno nomecommessa e idarticolo
   // ProcessedFavorites è il preferito con il nome commessa per la visualizzazione UI
   const [rawFavorites, setRawFavorites] = useState<Favorite[]>([]);
 
@@ -60,19 +59,23 @@ function App() {
 
   type SidebarItem = { label: string; Icon: SvgIconComponent };
 
-  const sideBarItems: SidebarItem[] = [
-    { label: "Registra Oggi", Icon: AddTaskIcon },
-    { label: "Mensile", Icon: CalendarMonthIcon },
-    { label: "Settimanale", Icon: CalendarViewWeekIcon },
-    { label: "Giornata", Icon: CalendarTodayIcon },
-    { label: "Statistiche", Icon: AssessmentIcon },
-  ];
+  const sideBarItems: SidebarItem[] =
+    currentPage === "stats"
+      ? [
+          { label: "Calendario", Icon: CalendarMonthIcon },
+          { label: "Statistiche", Icon: AssessmentIcon },
+        ]
+      : [
+          { label: "Aggiungi Attività", Icon: AddTaskIcon },
+          { label: "Statistiche", Icon: AssessmentIcon },
+        ];
 
   useEffect(() => {
     const init = async () => {
+      const hasPrevSession = readLocalData() !== null;
       const loggedIn = await checkIsLogged();
-      if (!loggedIn) {
-        showError("Effettuare il login", LOGIN_HINT_TTL_MS);
+      if (!loggedIn && hasPrevSession) {
+        showError("Sessione scaduta.", LOGIN_HINT_TTL_MS);
       }
       setIsLogged(loggedIn);
       setIsLoading(false);
@@ -149,12 +152,12 @@ function App() {
     }
 
     switch (buttonValue) {
-      case "Registra Oggi":
+      case "Aggiungi Attività":
         setSelectedDay(dateToKey(new Date()));
         setIsModalActive(true);
         break;
-      case "Scarica Report":
-        setCurrentPage("stats");
+      case "Calendario":
+        setCurrentPage("calendar");
         break;
       case "Statistiche":
         setCurrentPage("stats");
@@ -173,7 +176,7 @@ function App() {
       {!isLogged ? (
         <LoginPage isLogged={setIsLogged} />
       ) : (
-        <div className="flex flex-row bg-slate-900 w-full h-full justify-center align-center overflow-auto">
+        <div className="flex flex-row bg-base w-full h-full justify-center align-center overflow-auto">
           {isModalActive && (
             <Modal
               entries={entries}
@@ -200,23 +203,15 @@ function App() {
               ].join(" ")}
             >
               {sideBarItems.map(({ label, Icon }) => {
-                const isActive =
-                  label === "Statistiche"
-                    ? currentPage === "stats"
-                    : currentPage === "calendar" && view === label;
                 return (
                   <button
                     key={label}
                     type="button"
                     aria-label={collapsed ? label : undefined}
                     title={collapsed ? label : undefined}
-                    aria-current={isActive ? "page" : undefined}
+                    aria-current={"page"}
                     className={[
                       sideBarStyle.button.default,
-                      label === sideBarItems[0].label
-                        ? sideBarStyle.button.addAttivita
-                        : "",
-                      isActive ? "bg-blue-700" : "",
                       collapsed ? "flex items-center justify-center" : "",
                     ].join(" ")}
                     onClick={() => handleSidebar(label)}
@@ -237,6 +232,7 @@ function App() {
                 entries={entries}
                 settings={settings}
                 view={view}
+                onViewChange={setView}
                 handleClickDay={(e) => {
                   setSelectedDay(e);
                   setIsModalActive(true);
@@ -277,8 +273,8 @@ export default App;
 const sideBarStyle = {
   button: {
     default:
-      "flex items-center rounded-md px-3 py-1 w-full text-sm text-left text-slate-100 hover:bg-slate-800 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900",
-    addAttivita: " bg-blue-600 hover:bg-blue-700 text-white font-medium ",
+      "flex items-center rounded-md px-3 py-1 w-full text-sm text-left text-primary hover:bg-surface transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-base",
+    addAttivita: " bg-accent hover:bg-accent-hover text-white font-medium ",
   },
   icon: "mr-2",
 };

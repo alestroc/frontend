@@ -18,7 +18,7 @@ import {
   DEFAULT_MAX_HOURS,
   DEFAULT_MIN_HOURS,
 } from "../../config";
-import { addFavorite } from "../../functions/favorites";
+import { addFavorite, removeFavorites } from "../../functions/favorites";
 import SwitchButton from "./SwitchButton";
 
 interface SingleDayFormProps {
@@ -33,6 +33,7 @@ interface SingleDayFormProps {
   onClose: () => void;
   showError?: (message: string) => void;
   setIsSingleDayMode: React.Dispatch<React.SetStateAction<boolean>>;
+  isSingleDayMode: boolean;
 }
 
 export default function SingleDayForm({
@@ -47,6 +48,7 @@ export default function SingleDayForm({
   onClose,
   showError,
   setIsSingleDayMode,
+  isSingleDayMode,
 }: SingleDayFormProps) {
   const [selectedDay, setSelectedDay] = useState<string | null>(
     initialSelectedDay,
@@ -110,13 +112,20 @@ export default function SingleDayForm({
 
   return (
     <>
-      <h2 className="pt-5 text-xl font-semibold ">Inserimento Singolo</h2>
-
+      <div className="flex justify-between px-5">
+        <h2 className="pt-5 text-xl font-semibold text-primary ">
+          Inserimento Singolo
+        </h2>
+        <SwitchButton
+          setIsSingleDayMode={setIsSingleDayMode}
+          isSingleDayMode={isSingleDayMode}
+        />
+      </div>
       <div className="flex justify-between h-55 shrink-0 gap-2 min-h-35 px-4">
-        <div className="flex-1 rounded-md border border-slate-200 bg-slate-900 overflow-hidden">
-          <h4 className="px-6 my-2 text-sm font-medium text-white">
+        <div className="flex-1 rounded-md border border-divider-soft bg-base overflow-hidden">
+          <h4 className="px-6 my-2 text-sm font-medium text-primary">
             Giorno selezionato:{" "}
-            <span className="text-white font-semibold">
+            <span className="text-primary font-semibold">
               {selectedDay?.split("-").reverse().join("-") ?? "nessuno"}
             </span>
           </h4>
@@ -129,7 +138,7 @@ export default function SingleDayForm({
             handleClickDay={(key) => setSelectedDay(key)}
           />
         </div>
-        <div className="flex-1 min-h-0 overflow-y-auto rounded-md border border-slate-200 bg-slate-50 p-3 text-sm text-slate-500">
+        <div className="flex-1 min-h-0 overflow-y-auto rounded-md border border-divider-soft bg-slate-50 p-3 text-sm text-slate-500">
           <Favorites
             favorites={favorites}
             reloadFavorites={reloadFavorites}
@@ -137,7 +146,7 @@ export default function SingleDayForm({
           />
         </div>
       </div>
-      <div className="border-t border-slate-200 flex flex-col gap-3 px-4 py-4 mt-4">
+      <div className="border-t border-divider-soft flex flex-col gap-3 px-4 py-4 mt-4">
         {form.formError && (
           <p className="text-sm font-medium text-red-700 bg-red-50 border border-red-200 rounded-md px-3 py-2">
             {form.formError}
@@ -158,9 +167,10 @@ export default function SingleDayForm({
           />
         ))}
       </div>
-      <div className="border-t border-slate-200 flex flex-col gap-2 px-4 py-4 bg-slate-400">
+      <div className="border-t border-divider-soft flex flex-col gap-2 px-4 py-4 bg-surface-raised/60">
         <EntryList
           entries={existingEntries}
+          favorites={favorites}
           onInsertFavorite={async (entry) => {
             try {
               await addFavorite(entry);
@@ -171,23 +181,32 @@ export default function SingleDayForm({
               );
             }
           }}
+          onRemoveFavorite={async (favoriteId) => {
+            try {
+              await removeFavorites(favoriteId);
+              reloadFavorites();
+            } catch (e) {
+              showError?.(
+                e instanceof Error ? e.message : "Errore rimozione preferito.",
+              );
+            }
+          }}
         />
       </div>
 
-      <div className="mt-auto sticky bottom-0 flex p-2 bg-slate-600 border-t border-slate-200 justify-between w-full">
-        <SwitchButton setIsSingleDayMode={setIsSingleDayMode} />
+      <div className="mt-auto sticky bottom-0 flex p-2 bg-surface-raised border-t border-divider-soft justify-between w-full">
         <div className="flex gap-3">
           <button
             onClick={handleConfirm}
             disabled={form.isSaving}
-            className="px-4 py-2 rounded-md bg-blue-600 text-white font-medium hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="px-4 py-2 rounded-md bg-accent text-white font-medium hover:bg-accent-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             Conferma
           </button>
           <button
             onClick={onClose}
             disabled={form.isSaving}
-            className="px-4 py-2 rounded-md border border-slate-300 bg-white text-slate-700 font-medium hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:opacity-50 transition-colors"
+            className="px-4 py-2 rounded-md border border-slate-300 bg-white text-slate-700 font-medium hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 disabled:opacity-50 transition-colors"
           >
             Annulla
           </button>

@@ -6,13 +6,37 @@ interface ExploreCommessaProps {
   entries: TimeEntry[];
 }
 
-type DateFilter = "all" | "year" | "month" | "week";
+type Preset = "all" | "year" | "month" | "week";
+
+// Calcola lo "YYYY-MM-DD" del primo giorno del preset richiesto.
+function presetFromDate(preset: Preset): string {
+  const now = new Date();
+  if (preset === "year") return `${now.getFullYear()}-01-01`;
+  if (preset === "month") {
+    const m = String(now.getMonth() + 1).padStart(2, "0");
+    return `${now.getFullYear()}-${m}-01`;
+  }
+  if (preset === "week") {
+    const d = new Date(now);
+    d.setDate(d.getDate() - ((d.getDay() + 6) % 7));
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${d.getFullYear()}-${m}-${day}`;
+  }
+  return "";
+}
 
 export default function ExploreCommessa({ entries }: ExploreCommessaProps) {
   const [selectedCommessa, setSelectedCommessa] = useState<string | null>(null);
   const [selectedArticolo, setSelectedArticolo] = useState<string | null>(null);
-  const [dateFilter, setDateFilter] = useState<DateFilter>("all");
+  const [fromDate, setFromDate] = useState<string>("");
+  const [toDate, setToDate] = useState<string>("");
   const [expanded, setExpanded] = useState(false);
+
+  function applyPreset(preset: Preset) {
+    setFromDate(presetFromDate(preset));
+    setToDate("");
+  }
 
   // Lista deduplicata di commesse trovate nelle entries
   const commesseOptions = useMemo(() => {
@@ -39,29 +63,17 @@ export default function ExploreCommessa({ entries }: ExploreCommessaProps) {
     return Array.from(map, ([id, label]) => ({ id, label }));
   }, [byCommessa]);
 
-  // Soglia di data per i filtri rapidi
-  const dateThreshold = useMemo(() => {
-    const now = new Date();
-    if (dateFilter === "year") return new Date(now.getFullYear(), 0, 1);
-    if (dateFilter === "month")
-      return new Date(now.getFullYear(), now.getMonth(), 1);
-    if (dateFilter === "week") {
-      const d = new Date(now);
-      d.setDate(d.getDate() - ((d.getDay() + 6) % 7));
-      d.setHours(0, 0, 0, 0);
-      return d;
-    }
-    return null;
-  }, [dateFilter]);
+  // Entries filtrate per commessa + articolo + range di date.
+  // fromDate/toDate sono stringhe "YYYY-MM-DD"
 
-  // Entries filtrate per commessa + articolo + data
   const filtered = useMemo(() => {
     return byCommessa.filter((e) => {
       if (selectedArticolo && e.idarticolo !== selectedArticolo) return false;
-      if (dateThreshold && new Date(e.giorno) < dateThreshold) return false;
+      if (fromDate && e.giorno < fromDate) return false;
+      if (toDate && e.giorno > toDate) return false;
       return true;
     });
-  }, [byCommessa, selectedArticolo, dateThreshold]);
+  }, [byCommessa, selectedArticolo, fromDate, toDate]);
 
   const totHours = filtered.reduce((s, e) => s + Number(e.ore), 0);
   const dates = filtered.map((e) => e.giorno).sort();
@@ -69,8 +81,8 @@ export default function ExploreCommessa({ entries }: ExploreCommessaProps) {
   const lastDate = dates[dates.length - 1] ?? null;
 
   return (
-    <section className="rounded-md border border-slate-700 bg-slate-800 p-4">
-      <h2 className="text-lg font-semibold text-slate-100 mb-3">
+    <section className="rounded-md border border-divider bg-surface p-4">
+      <h2 className="text-lg font-semibold text-secondary mb-3">
         Esplora commessa
       </h2>
 
@@ -100,28 +112,44 @@ export default function ExploreCommessa({ entries }: ExploreCommessaProps) {
 
       {selectedCommessa && (
         <>
-          <div className="flex gap-2 mb-3">
-            {(["all", "year", "month", "week"] as DateFilter[]).map((f) => (
-              <button
-                key={f}
-                type="button"
-                onClick={() => setDateFilter(f)}
-                className={[
-                  "px-3 py-1 rounded-md text-sm transition-colors",
-                  dateFilter === f
-                    ? "bg-blue-600 text-white"
-                    : "bg-slate-700 text-slate-200 hover:bg-slate-600",
-                ].join(" ")}
-              >
-                {f === "all" && "Tutti"}
-                {f === "year" && "Quest'anno"}
-                {f === "month" && "Questo mese"}
-                {f === "week" && "Questa settimana"}
-              </button>
-            ))}
+          <div className="flex flex-wrap items-end gap-3 mb-3">
+            <label className="text-xs text-secondary">
+              Dal
+              <input
+                type="date"
+                value={fromDate}
+                onChange={(e) => setFromDate(e.target.value)}
+                className="block mt-1 rounded-md px-2 py-1 bg-white text-slate-900 border border-slate-300 text-sm"
+              />
+            </label>
+            <label className="text-xs text-muted">
+              Al
+              <input
+                type="date"
+                value={toDate}
+                onChange={(e) => setToDate(e.target.value)}
+                className="block mt-1 rounded-md px-2 py-1 bg-white text-slate-900 border border-slate-300 text-sm"
+              />
+            </label>
+
+            <div className="flex gap-2">
+              {(["all", "year", "month", "week"] as Preset[]).map((f) => (
+                <button
+                  key={f}
+                  type="button"
+                  onClick={() => applyPreset(f)}
+                  className="px-3 py-1 rounded-md text-sm transition-colors bg-surface-raised text-secondary hover:bg-surface-strong"
+                >
+                  {f === "all" && "Tutti"}
+                  {f === "year" && "Quest'anno"}
+                  {f === "month" && "Questo mese"}
+                  {f === "week" && "Questa settimana"}
+                </button>
+              ))}
+            </div>
           </div>
 
-          <div className="flex flex-wrap gap-6 text-sm text-slate-200 mb-3">
+          <div className="flex flex-wrap gap-6 text-sm text-secondary mb-3">
             <div>
               Totale ore: <span className="font-bold">{totHours}h</span>
             </div>
@@ -141,15 +169,15 @@ export default function ExploreCommessa({ entries }: ExploreCommessaProps) {
           <button
             type="button"
             onClick={() => setExpanded((v) => !v)}
-            className="text-sm text-blue-400 hover:text-blue-300 mb-2"
+            className="text-sm text-accent-soft hover:text-accent mb-2"
           >
             {expanded ? "▲ Riduci" : "▼ Espandi tabella"}
           </button>
 
           {expanded && (
-            <div className="overflow-auto max-h-80 rounded-md border border-slate-700">
-              <table className="w-full text-sm text-left text-slate-200">
-                <thead className="bg-slate-900 text-xs uppercase">
+            <div className="overflow-auto max-h-80 rounded-md border border-divider">
+              <table className="w-full text-sm text-left text-secondary">
+                <thead className="bg-base text-xs uppercase">
                   <tr>
                     <th className="px-3 py-2">Data</th>
                     <th className="px-3 py-2">Ore</th>
@@ -159,8 +187,10 @@ export default function ExploreCommessa({ entries }: ExploreCommessaProps) {
                 </thead>
                 <tbody>
                   {filtered.map((e, i) => (
-                    <tr key={i} className="border-t border-slate-700">
-                      <td className="px-3 py-2">{e.giorno}</td>
+                    <tr key={i} className="border-t border-divider">
+                      <td className="px-3 py-2">
+                        {e.giorno.split("-").reverse().join("-")}
+                      </td>
                       <td className="px-3 py-2">{Number(e.ore)}h</td>
                       <td className="px-3 py-2">
                         {e.nomearticolo ?? e.idarticolo}

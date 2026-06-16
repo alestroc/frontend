@@ -51,11 +51,12 @@ function Modal({
     onClose,
     showError,
     setIsSingleDayMode,
+    isSingleDayMode,
   };
 
   return (
     <>
-      <div className="flex flex-col gap-3 align-middle z-99 absolute w-[60%] h-[90%] self-center mx-[25%] bg-slate-700 rounded-lg shadow-2xl overflow-auto ">
+      <div className="flex flex-col gap-3 align-middle z-99 absolute w-[60%] h-[90%] self-center mx-[25%] bg-surface rounded-lg shadow-2xl overflow-auto ">
         {isSingleDayMode ? (
           <SingleDayForm {...sharedProps} initialSelectedDay={selectedDay} />
         ) : (

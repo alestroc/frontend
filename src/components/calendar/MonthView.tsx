@@ -33,7 +33,7 @@ export default function MonthView({ cursor, renderCell }: Monthprop) {
         {DAYS_OF_WEEK.map((d) => (
           <div
             key={d}
-            className="text-center text-xs font-semibold border border-gray-700 text-white py-1"
+            className="text-center text-xs font-semibold border border-divider text-primary py-1"
           >
             {d}
           </div>

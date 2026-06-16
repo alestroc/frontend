@@ -36,20 +36,18 @@ export default function CalendarCell({
       className={[
         "p-1 border transition-colors overflow-hidden",
         disabled
-          ? "opacity-40 cursor-not-allowed border-slate-700 bg-slate-800/60"
-          : "cursor-pointer hover:border-blue-400",
-        isToday
-          ? "bg-blue-400 border-blue-600 hover:bg-blue-700"
-          : !disabled
-            ? "bg-slate-800 border-slate-700"
-            : "",
-        isSelected ? "ring-2 ring-blue-400 ring-inset" : "",
+          ? "opacity-40 cursor-not-allowed border-divider bg-surface/60"
+          : "cursor-pointer hover:border-accent-soft",
+        !disabled ? "bg-surface border-divider" : "",
+        isSelected ? "ring-2 ring-accent-soft ring-inset" : "",
       ].join(" ")}
     >
       <div
         className={[
-          "text-xs font-semibold mb-1",
-          isToday ? "text-white" : "text-slate-100",
+          "text-xs font-semibold text-primary text-center mb-1 justify-self-center",
+          isToday
+            ? "bg-accent-soft border-accent rounded-full w-5 h-5 flex items-center justify-center leading-none hover:bg-accent-hover"
+            : "",
         ].join(" ")}
       >
         {date.getDate()}
@@ -66,8 +64,8 @@ export default function CalendarCell({
               className={[
                 "border-t text-center text-xs font-semibold",
                 (settings ? totalHours === settings.maxHours : totalHours === 8)
-                  ? "bg-emerald-600 text-white border-emerald-700"
-                  : "bg-red-400 text-slate-900 border-red-500",
+                  ? "bg-success text-white border-success"
+                  : "bg-danger-soft text-slate-900 border-danger",
               ].join(" ")}
             >
               {totalHours}h

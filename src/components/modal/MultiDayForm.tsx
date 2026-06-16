@@ -31,6 +31,7 @@ export interface MultiDayFormProps {
   onClose: () => void;
   showError?: (message: string) => void;
   setIsSingleDayMode: React.Dispatch<React.SetStateAction<boolean>>;
+  isSingleDayMode: boolean;
 }
 export default function MultiDayForm({
   entries,
@@ -43,6 +44,7 @@ export default function MultiDayForm({
   onClose,
   showError,
   setIsSingleDayMode,
+  isSingleDayMode,
 }: MultiDayFormProps) {
   const [selectedDays, setSelectedDays] = useState<string[]>([]);
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
@@ -105,8 +107,13 @@ export default function MultiDayForm({
 
   return (
     <>
-      <h2 className="px-6 pt-5 text-xl font-semibold ">Inserimento Multiplo</h2>
-
+      <div className="flex justify-between px-5">
+        <h2 className=" pt-5 text-xl font-semibold ">Inserimento Multiplo</h2>
+        <SwitchButton
+          isSingleDayMode={isSingleDayMode}
+          setIsSingleDayMode={setIsSingleDayMode}
+        />
+      </div>
       <div className="flex flex-col p-2 ">
         <EntryRowEditor
           row={form.row}
@@ -119,7 +126,7 @@ export default function MultiDayForm({
       </div>
 
       <div className="flex gap-3 p-3 max-h-60">
-        <div className="flex-1 rounded-md border border-slate-200 bg-slate-900 overflow-hidden">
+        <div className="flex-1 rounded-md border border-divider-soft bg-base overflow-hidden">
           <Calendar
             entries={entries}
             settings={settings}
@@ -129,7 +136,7 @@ export default function MultiDayForm({
             handleClickDay={toggleDay}
           />
         </div>
-        <div className="flex-1 min-h-0 overflow-y-auto rounded-md border border-slate-200 bg-slate-50 p-3 text-sm text-slate-500">
+        <div className="flex-1 min-h-0 overflow-y-auto rounded-md border border-divider-soft bg-slate-50 p-3 text-sm text-slate-500">
           <Favorites
             favorites={favorites}
             reloadFavorites={reloadFavorites}
@@ -138,7 +145,7 @@ export default function MultiDayForm({
         </div>
       </div>
 
-      <div className="border-t border-slate-200 px-4 py-4 text-white text-sm">
+      <div className="border-t border-divider-soft px-4 py-4 text-primary text-sm">
         {form.formError && (
           <p
             role="alert"
@@ -186,7 +193,7 @@ export default function MultiDayForm({
                     className={[inputClass, "overflow-hidden m-2"].join(" ")}
                   />
                 </div>
-                <p className="flex flex-1 text-xs text-slate-300 align-center">
+                <p className="flex flex-1 text-xs text-primary align-center">
                   {availableHours}h disponibili
                 </p>
               </div>
@@ -210,22 +217,21 @@ export default function MultiDayForm({
         />
       )}
 
-      <div className="mt-auto sticky bottom-0 flex p-2 bg-slate-600 border-t border-slate-200 justify-between w-full">
-        <SwitchButton setIsSingleDayMode={setIsSingleDayMode} />
+      <div className="mt-auto sticky bottom-0 flex p-2 bg-surface-strong border-t border-divider-soft justify-between w-full">
         <div className="flex gap-3">
           <button
             onClick={() => {
               handleConfirm();
             }}
             disabled={form.isSaving || selectedDays.length === 0}
-            className="px-4 py-2 rounded-md bg-blue-600 text-white font-medium hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="px-4 py-2 rounded-md bg-accent text-white font-medium hover:bg-accent-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             Conferma
           </button>
           <button
             onClick={onClose}
             disabled={form.isSaving}
-            className="px-4 py-2 rounded-md border border-slate-300 bg-white text-slate-700 font-medium hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:opacity-50 transition-colors"
+            className="px-4 py-2 rounded-md border border-slate-300 bg-white text-slate-700 font-medium hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 disabled:opacity-50 transition-colors"
           >
             Annulla
           </button>

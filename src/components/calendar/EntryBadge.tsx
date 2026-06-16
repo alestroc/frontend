@@ -16,7 +16,7 @@ export default function EntryBadge({ entry, view }: EntryBadgeProp) {
       >
         <div className="flex flex-row items-baseline gap-2 wrap-break-word whitespace-normal p-0.5">
           <span className="font-bold">{hours}h</span>
-          <span className="font-semibold">{entry.nomecommessa} -</span>
+          <span className="font-semibold">{entry.nomecommessa}-</span>
           <span className="text-sm opacity-80">{entry.idarticolo} </span>
           {entry.nota && (
             <span className="text-sm italic opacity-90">- {entry.nota}</span>

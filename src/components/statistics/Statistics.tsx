@@ -12,7 +12,7 @@ interface StatisticsProps {
   showError?: (message: string) => void;
 }
 
-// Conta i giorni lavorativi (Lun–Ven + sab/dom in base alle settings) in un range
+// Conta i giorni lavorativi in un range
 function workingDaysIn(
   from: Date,
   to: Date,
@@ -22,11 +22,11 @@ function workingDaysIn(
   let count = 0;
   const cur = new Date(from);
   while (cur <= to) {
-    const dow = cur.getDay(); // 0=Dom .. 6=Sab
+    const dayOfWeek = cur.getDay(); // 0=Dom .. 6=Sab
     const isWorkday =
-      (dow >= 1 && dow <= 5) ||
-      (dow === 6 && allowSat) ||
-      (dow === 0 && allowSun);
+      (dayOfWeek >= 1 && dayOfWeek <= 5) ||
+      (dayOfWeek === 6 && allowSat) ||
+      (dayOfWeek === 0 && allowSun);
     if (isWorkday) count++;
     cur.setDate(cur.getDate() + 1);
   }
@@ -55,6 +55,7 @@ export default function Statistics({
 
     let wh = 0;
     let mh = 0;
+
     for (const e of entries) {
       const d = new Date(e.giorno);
       const ore = Number(e.ore);
@@ -62,19 +63,24 @@ export default function Statistics({
       if (d >= monthStart && d <= monthEnd) mh += ore;
     }
 
+    // Per il target mensile usiamo fino ad "oggi"
+    const monthTargetEnd = now < monthEnd ? now : monthEnd;
+    const weekTargetEnd = now < weekEnd ? now : weekEnd;
+
     return {
       weekHours: wh,
-      weekTarget: workingDaysIn(weekStart, weekEnd, allowSat, allowSun) * maxHours,
+      weekTarget:
+        workingDaysIn(weekStart, weekTargetEnd, allowSat, allowSun) * maxHours,
       monthHours: mh,
       monthTarget:
-        workingDaysIn(monthStart, monthEnd, allowSat, allowSun) * maxHours,
+        workingDaysIn(monthStart, monthTargetEnd, allowSat, allowSun) *
+        maxHours,
     };
   }, [entries, maxHours, allowSat, allowSun]);
 
   return (
     <div className="flex flex-col gap-4 p-4 w-full">
-      <h1 className="text-2xl font-bold text-slate-100">Statistiche</h1>
-
+      <h1 className="text-2xl font-bold text-primary">Statistiche</h1>
       <section className="flex flex-wrap gap-4">
         <ProgressGoal
           label="Settimanale"
