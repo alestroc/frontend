@@ -37,12 +37,12 @@ export default function LoginPage({
   }
 
   return (
-    <div className="flex flex-col w-[30%] h-[55vh] items-center justify-center border border-divider rounded-md bg-base">
+    <div className="flex flex-col w-[30%] h-[60vh] items-center justify-center border border-divider rounded-md bg-base">
       <div className="flex items-center justify-center px-8 py-6 text-primary">
         <Logo className="h-12 w-auto" />
       </div>
 
-      <div className="flex w-full h-full items-center justify-center rounded-md bg-surface text-primary">
+      <div className="flex w-full h-full  items-center justify-center rounded-md bg-surface text-primary">
         <div className="flex flex-col w-[75%]">
           <form onSubmit={handleSubmit}>
             <h3>Email</h3>
