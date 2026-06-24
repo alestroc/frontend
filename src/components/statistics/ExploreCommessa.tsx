@@ -138,7 +138,7 @@ export default function ExploreCommessa({ entries }: ExploreCommessaProps) {
                   key={f}
                   type="button"
                   onClick={() => applyPreset(f)}
-                  className="px-3 py-1 rounded-md text-sm transition-colors bg-surface-raised text-secondary hover:bg-surface-strong"
+                  className="px-3 py-1 rounded-md text-sm transition-colors hover:bg-surface-raised text-secondary bg-surface-strong"
                 >
                   {f === "all" && "Tutti"}
                   {f === "year" && "Quest'anno"}
@@ -177,7 +177,7 @@ export default function ExploreCommessa({ entries }: ExploreCommessaProps) {
           {expanded && (
             <div className="overflow-auto max-h-80 rounded-md border border-divider">
               <table className="w-full text-sm text-left text-secondary">
-                <thead className="bg-base text-xs uppercase">
+                <thead className="bg-surface text-xs uppercase">
                   <tr>
                     <th className="px-3 py-2">Data</th>
                     <th className="px-3 py-2">Ore</th>
@@ -187,7 +187,7 @@ export default function ExploreCommessa({ entries }: ExploreCommessaProps) {
                 </thead>
                 <tbody>
                   {filtered.map((e, i) => (
-                    <tr key={i} className="border-t border-divider">
+                    <tr key={i} className="border-t bg-base border-divider">
                       <td className="px-3 py-2">
                         {e.giorno.split("-").reverse().join("-")}
                       </td>

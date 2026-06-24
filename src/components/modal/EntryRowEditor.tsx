@@ -35,7 +35,7 @@ export default function EntryRowEditor({
 }: EntryRowEditorProps) {
   return (
     <div className="flex flex-1 gap-2 items-center ">
-      <div className="flex-4">
+      <div className="flex-5">
         <Combobox
           options={commesseOptions}
           value={row.idcommessa}
@@ -53,7 +53,7 @@ export default function EntryRowEditor({
       </div>
       {isSingleDay && (
         <>
-          <div className="flex-1.5 ">
+          <div className="flex-1 ">
             <input
               type="number"
               placeholder="Ore"
@@ -65,7 +65,7 @@ export default function EntryRowEditor({
               className={[inputClass, " appearance-textfield"].join(" ")}
             />
           </div>
-          <div className=" flex-5  overflow-auto">
+          <div className=" flex-4  overflow-auto">
             <input
               type="text"
               placeholder="Nota"

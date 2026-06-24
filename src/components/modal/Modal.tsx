@@ -9,7 +9,7 @@ import type {
 import SingleDayForm from "./SingleDayForm";
 import MultiDayForm from "./MultiDayForm";
 
-interface ModalProp {
+interface ModalProps {
   entries: TimeEntry[];
   settings: ApiSettings | null;
   isModalActive: React.Dispatch<React.SetStateAction<boolean>>;
@@ -33,7 +33,7 @@ function Modal({
   favorites,
   showError,
   reloadFavorites,
-}: ModalProp) {
+}: ModalProps) {
   // true → x commesse per singolo giorno
   // false → x giorni per commessa singola
   const [isSingleDayMode, setIsSingleDayMode] = useState(true);

@@ -66,7 +66,7 @@ function App() {
           { label: "Statistiche", Icon: AssessmentIcon },
         ]
       : [
-          { label: "Aggiungi Attività", Icon: AddTaskIcon },
+          { label: "Registra Oggi", Icon: AddTaskIcon },
           { label: "Statistiche", Icon: AssessmentIcon },
         ];
 
@@ -152,7 +152,7 @@ function App() {
     }
 
     switch (buttonValue) {
-      case "Aggiungi Attività":
+      case "Registra Oggi":
         setSelectedDay(dateToKey(new Date()));
         setIsModalActive(true);
         break;
@@ -273,7 +273,7 @@ export default App;
 const sideBarStyle = {
   button: {
     default:
-      "flex items-center rounded-md px-3 py-1 w-full text-sm text-left text-primary hover:bg-surface transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-base",
+      "flex items-center rounded-md px-3 py-1 w-full text-sm text-left text-primary hover:bg-base transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-base",
     addAttivita: " bg-accent hover:bg-accent-hover text-white font-medium ",
   },
   icon: "mr-2",

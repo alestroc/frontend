@@ -43,9 +43,9 @@
   /* ============== B) FIXED (identici in entrambi i temi) ============== */
 
   /* ACCENT — identità del brand, call-to-action. */
-  --color-accent: #2563eb;           /* bottoni primari (Conferma, Aggiungi Attività) */
-  --color-accent-hover: #1d4ed8;     /* stato hover dei bottoni primari */
-  --color-accent-soft: #60a5fa;      /* evidenziazione "giorno di oggi" nel calendario */
+  --color-accent: #2563eb;           
+  --color-accent-hover: #1d4ed8;    
+  --color-accent-soft: #60a5fa;    
 
   /* STATI SEMANTICI — feedback visivo all'utente. */
   --color-success: #10b981;          /* target raggiunto, ore complete (barre/badge) */
@@ -57,40 +57,35 @@
   /* BRAND PUNTUALE — colori usati in punti specifici dell'UI. */
   --color-favorite: #facc15;         /* stella attiva nei preferiti (giallo) */
 
-  /* ============== C) FORM-FIXED (sempre chiari) ============== */
+  /* ============== C) FORM-FIXED ============== */
 
-  /* Superfici dei controlli di input + EntryList.
-     Restano "isole chiare" anche in tema scuro per dare contrasto e leggibilità.
-     Per testo/bordi DENTRO i form usa direttamente slate-900/slate-500/slate-300
-     (non hanno bisogno di tokenizzazione: il fondo bianco è sempre bianco). */
-  --color-form: #ffffff;             /* sfondo input (combobox, date, text) */
-  --color-form-elevated: #f8fafc;    /* container EntryList, Favorites */
+
+  --color-form: #ffffff;     
+  --color-form-elevated: #f8fafc;  
 }
 
 /* ---------------------------------------------------------------------------
  * OVERRIDE TEMA CHIARO
- * Si attiva aggiungendo la classe `.light` su <html>.
- * Tocca SOLO i token della famiglia A (theme-bound).
- * I token B (accent/stati) e C (form) restano invariati come definiti sopra.
  * --------------------------------------------------------------------------- */
 
 .light {
-  /* Sfondi — gerarchia 4 livelli, dal più chiaro al più scuro.
-     Saturazione +50% rispetto alla versione precedente, restando chiari. */
-   --color-base: #dbeefc;        /*     sfondo app, azzurro chiaro evidente */
-  --color-surface: #b8dff8;          /* b8dfc8 card, azzurro più "vivo" */
-  --color-surface-raised: #8fcbed;   /* caselle selezionabili, ben distinte */
-  --color-surface-strong: #6ecafb;   /*  5fb0db caselle disabilitate / header, azzurro pieno */
+  /* Sfondi — 4 livelli con salti percepibili per ricreare la profondità del dark.
+     Dal più chiaro (app background) al più scuro (header/footer modale). */
+  --color-base:            #ffffff;   /* sfondo app */
+  --color-surface:         #f5f5f5;   /* card */
+  --color-surface-raised:  #ebebeb;   /* box dentro card */
+  --color-surface-strong:  #e0e0e0;   /* header/footer modale */
 
-  /* Testo — slate scuri per alto contrasto sul fondo azzurro */
+  /* Testo */
   --color-primary: #0f172a;
   --color-secondary: #334155;
-  --color-muted: #475569;             /* più scuro per essere leggibile sui surface saturi */
+  --color-muted: #475569;
 
-  /* Bordi — blu più saturi che stagliano le card */
-  --color-divider: #96c5ff;
-  --color-divider-soft: #93c5fd;
+  /* Bordi */
+  --color-divider:      #c4c4c4;   /* bordo card, contenitori principali */
+  --color-divider-soft: #e5e5e5;   /* divider discreti, separatori leggeri */
 }
+
 
 :root {
   --text: white;

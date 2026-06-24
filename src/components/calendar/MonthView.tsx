@@ -1,12 +1,12 @@
 import type { ReactNode } from "react";
 import { DAYS_OF_WEEK } from "./../../functions/config.ts";
 
-interface Monthprop {
+interface MonthViewProps {
   cursor: Date;
   renderCell: (date: Date) => ReactNode;
 }
 
-export default function MonthView({ cursor, renderCell }: Monthprop) {
+export default function MonthView({ cursor, renderCell }: MonthViewProps) {
   const year = cursor.getFullYear();
   const month = cursor.getMonth();
   const firstDay = new Date(year, month, 1);

@@ -25,7 +25,7 @@ export default function Sidebar({
   return (
     <div
       className={[
-        "flex flex-col h-full border-r bg-base border-divider transition-all duration-300",
+        "flex flex-col h-full border-r bg-surface border-divider transition-all duration-300",
         collapsed ? "w-12" : "w-56",
       ].join(" ")}
     >
@@ -41,7 +41,7 @@ export default function Sidebar({
 
         <button
           onClick={() => setCollapsed((prev) => !prev)}
-          className="flex items-center justify-center h-14 w-12  self-center text-muted hover:bg-surface hover:text-primary transition-colors shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-base"
+          className="flex items-center justify-center h-14 w-12  self-center text-muted hover:bg-base hover:text-primary transition-colors shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-base"
           title={collapsed ? "Espandi" : "Comprimi"}
         >
           <span className="text-lg leading-none">

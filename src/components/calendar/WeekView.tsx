@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { DAYS_OF_WEEK } from "../../functions/config";
 import { dateToKey, getWeekStart } from "../../functions/functions";
 
-interface WeekProp {
+interface WeekViewProps {
   cursor: Date;
   renderCell: (date: Date) => ReactNode;
   isModal?: boolean;
@@ -12,7 +12,7 @@ export default function WeekView({
   cursor,
   renderCell,
   isModal = false,
-}: WeekProp) {
+}: WeekViewProps) {
   const weekStart = getWeekStart(cursor);
   const weekDays = Array.from({ length: 7 }, (_, i) => {
     const d = new Date(weekStart);

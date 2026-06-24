@@ -12,7 +12,7 @@ function readSavedTheme(): Theme {
   return saved === "light" ? "light" : "dark";
 }
 
-// Applica/rimuove la classe .light su <html>, attivando l'override del tema chiaro.
+// Applica/rimuove la classe .light su <html>
 function applyTheme(theme: Theme) {
   const root = document.documentElement;
   if (theme === "light") root.classList.add("light");
@@ -38,7 +38,11 @@ export default function ThemeToggle() {
       title={isDark ? "Passa al tema chiaro" : "Passa al tema scuro"}
       className="px-2 py-1 rounded-md text-secondary hover:bg-surface hover:text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
     >
-      {isDark ? <LightModeIcon fontSize="small" /> : <DarkModeIcon fontSize="small" />}
+      {isDark ? (
+        <LightModeIcon fontSize="small" />
+      ) : (
+        <DarkModeIcon fontSize="small" />
+      )}
     </button>
   );
 }

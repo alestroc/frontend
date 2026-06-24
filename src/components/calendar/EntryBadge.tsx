@@ -1,11 +1,11 @@
 import type { TimeEntry } from "../../types";
 
-interface EntryBadgeProp {
+interface EntryBadgeProps {
   view: string;
   entry: TimeEntry;
 }
 
-export default function EntryBadge({ entry, view }: EntryBadgeProp) {
+export default function EntryBadge({ entry, view }: EntryBadgeProps) {
   const hours = Number(entry.ore);
 
   if (view === "Giornata") {

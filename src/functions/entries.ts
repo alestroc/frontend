@@ -39,7 +39,7 @@ export async function getEntries(): Promise<TimeEntry[]> {
 
   if (!data.data || data.data.length === 0) return [];
 
-  return data.data.map((entry) => ({
+  const output = data.data.map((entry) => ({
     giorno: entry.giorno,
     idcommessa: entry.idcommessa,
     nomecommessa: entry.nomecommessa,
@@ -48,6 +48,8 @@ export async function getEntries(): Promise<TimeEntry[]> {
     ore: entry.ore,
     nota: entry.nota,
   }));
+
+  return output;
 }
 
 // "YYYY-MM-DD" -> Unix timestamp in secondi
