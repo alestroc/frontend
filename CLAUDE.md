@@ -20,7 +20,7 @@ There is no test runner configured.
 - **Tailwind CSS v4** (`@import "tailwindcss"` in `src/index.css`) — utility classes + custom design tokens via `@theme` block
 - **@dnd-kit/react** — drag & drop for sortable favorites
 - **@mui/icons-material** — icon set (Add, Clear, Star, Logout, ChevronLeft/Right, etc.)
-- **axios** — used only in `Login.tsx`; the rest of the app uses native `fetch`
+- Native `fetch` for all HTTP calls (no axios)
 - No routing library, no state management library
 
 ## Architecture
@@ -72,7 +72,7 @@ src/
 
 ### Page routing
 
-No router — `App.tsx` holds `currentPage: "calendar" | "stats"` state. Sidebar buttons swap pages; sidebar items change dynamically ("Aggiungi Attività" on calendar, "Calendario" on stats).
+No router — `App.tsx` holds `currentPage: "calendar" | "stats"` state. Sidebar buttons swap pages; sidebar items change dynamically ("Registra Oggi" on calendar, "Calendario" on stats).
 
 ### Modal
 
