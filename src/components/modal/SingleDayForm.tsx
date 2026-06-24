@@ -141,6 +141,7 @@ export default function SingleDayForm({
         <div className="flex-1 min-h-0 overflow-y-auto rounded-md border border-divider-soft bg-slate-50 p-3 text-sm text-slate-500">
           <Favorites
             favorites={favorites}
+            commesse={commesse}
             reloadFavorites={reloadFavorites}
             autocompleteFavorite={form.pickFavorite}
           />
@@ -167,7 +168,7 @@ export default function SingleDayForm({
           />
         ))}
       </div>
-      <div className="border-t border-divider-soft flex flex-col gap-2 px-4 py-4 bg-surface-raised/60">
+      <div className="border-t border-divider-soft flex flex-col gap-2 px-4 py-4 bg-surface-raised">
         <EntryList
           entries={existingEntries}
           favorites={favorites}

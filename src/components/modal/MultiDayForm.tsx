@@ -139,6 +139,7 @@ export default function MultiDayForm({
         <div className="flex-1 min-h-0 overflow-y-auto rounded-md border border-divider-soft bg-slate-50 p-3 text-sm text-slate-500">
           <Favorites
             favorites={favorites}
+            commesse={commesse}
             reloadFavorites={reloadFavorites}
             autocompleteFavorite={form.pickFavorite}
           />
@@ -217,7 +218,7 @@ export default function MultiDayForm({
         />
       )}
 
-      <div className="mt-auto sticky bottom-0 flex p-2 bg-surface-strong border-t border-divider-soft justify-between w-full">
+      <div className="mt-auto sticky bottom-0 flex p-2 bg-base border-t border-divider-soft justify-between w-full">
         <div className="flex gap-3">
           <button
             onClick={() => {

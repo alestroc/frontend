@@ -1,40 +1,34 @@
 import { DragDropProvider } from "@dnd-kit/react";
 import { move } from "@dnd-kit/helpers";
 import SortableItem from "./SortableItem";
-import { useEffect, useState } from "react";
-import type { ProcessedFavorite } from "../../types";
+import { useState } from "react";
+import type { Commessa, ProcessedFavorite } from "../../types";
 import { reorderFavorite } from "../../functions/favorites";
 
 interface FavoritesProps {
   favorites: ProcessedFavorite[];
+  commesse: Commessa[];
   reloadFavorites: () => void;
   autocompleteFavorite: (fav: ProcessedFavorite) => void;
 }
 
 export default function Favorites({
   favorites: initialFavorites,
+  commesse,
   reloadFavorites,
   autocompleteFavorite,
 }: FavoritesProps) {
-  // riordina i favorites prima di inizializzare lo stato
   const [favorites, setFavorites] = useState<ProcessedFavorite[]>(() =>
     [...initialFavorites].sort((a, b) => a.order_no - b.order_no),
   );
 
-  const [prevInitial, setPrevInitial] = useState(initialFavorites);
-
-  if (initialFavorites !== prevInitial) {
-    setPrevInitial(initialFavorites);
-    setFavorites([...initialFavorites].sort((a, b) => a.order_no - b.order_no));
-  }
-  useEffect(() => {
-    reorderFavorite(favorites);
-  }, [favorites]);
-
   return (
     <DragDropProvider
-      onDragEnd={(event) => {
-        setFavorites((prev) => move(prev, event));
+      onDragEnd={async (event) => {
+        const next = move(favorites, event);
+        setFavorites(next);
+        await reorderFavorite(next);
+        reloadFavorites();
       }}
     >
       Preferiti
@@ -44,6 +38,7 @@ export default function Favorites({
           id={fav.id}
           index={index}
           favorite={fav}
+          commesse={commesse}
           reloadFavorites={reloadFavorites}
           autocompleteFavorite={autocompleteFavorite}
         />
