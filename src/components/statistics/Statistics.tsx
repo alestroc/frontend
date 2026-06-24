@@ -5,6 +5,7 @@ import { getWeekStart } from "../../functions/functions";
 import ProgressGoal from "./ProgressGoal";
 import ExploreCommessa from "./ExploreCommessa";
 import DownloadReport from "./DownloadReport";
+import CardMostUsedEntries from "./CardMostUsedEntries";
 
 interface StatisticsProps {
   entries: TimeEntry[];
@@ -42,7 +43,16 @@ export default function Statistics({
   const allowSat = settings?.allowSaturday ?? false;
   const allowSun = settings?.allowSunday ?? false;
 
-  const { weekHours, weekTarget, monthHours, monthTarget } = useMemo(() => {
+  const {
+    weekHours,
+    weekTarget,
+    monthHours,
+    monthTarget,
+    yearStart,
+    yearEnd,
+    monthStart,
+    monthEnd,
+  } = useMemo(() => {
     const now = new Date();
 
     const weekStart = getWeekStart(now);
@@ -52,6 +62,9 @@ export default function Statistics({
 
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
     const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
+    const yearStart = new Date(now.getFullYear(), 0);
+    const yearEnd = new Date(now.getFullYear() + 1, 0);
 
     let wh = 0;
     let mh = 0;
@@ -75,6 +88,10 @@ export default function Statistics({
       monthTarget:
         workingDaysIn(monthStart, monthTargetEnd, allowSat, allowSun) *
         maxHours,
+      yearStart: yearStart,
+      yearEnd: yearEnd,
+      monthStart: monthStart,
+      monthEnd: monthEnd,
     };
   }, [entries, maxHours, allowSat, allowSun]);
 
@@ -97,6 +114,25 @@ export default function Statistics({
       <ExploreCommessa entries={entries} />
 
       <DownloadReport entries={entries} showError={showError} />
+
+      <h3>Classifica Commesse</h3>
+
+      <section className="flex flex-wrap items-start gap-4">
+        <CardMostUsedEntries entries={entries} />
+
+        <CardMostUsedEntries
+          entries={entries}
+          periodo="QUEST'ANNO"
+          da={yearStart}
+          a={yearEnd}
+        />
+        <CardMostUsedEntries
+          entries={entries}
+          periodo="QUESTO MESE"
+          da={monthStart}
+          a={monthEnd}
+        />
+      </section>
     </div>
   );
 }
