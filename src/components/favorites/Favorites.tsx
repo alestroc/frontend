@@ -22,6 +22,12 @@ export default function Favorites({
     [...initialFavorites].sort((a, b) => a.order_no - b.order_no),
   );
 
+  const [prevInitial, setPrevInitial] = useState(initialFavorites);
+  if (initialFavorites !== prevInitial) {
+    setPrevInitial(initialFavorites);
+    setFavorites([...initialFavorites].sort((a, b) => a.order_no - b.order_no));
+  }
+
   return (
     <DragDropProvider
       onDragEnd={async (event) => {
