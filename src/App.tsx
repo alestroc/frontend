@@ -84,6 +84,7 @@ function App() {
   }, [showError]);
 
   useEffect(() => {
+    // inizializzazione dati
     if (!isLogged) return;
     const loadData = async () => {
       try {
@@ -109,7 +110,6 @@ function App() {
   }, [isLogged, showError]);
 
   // valore che viene salvato in memoria per evitare che venga calcolato ad ogni re-render
-  // se le dipendenze (rawFavorites,commesse) cambiano, la funzione viene rieseguita per salvare il valore
   const processedFavorites = useMemo<ProcessedFavorite[]>(() => {
     return rawFavorites.map((fav) => {
       const c = commesse.find((x) => x.id === fav.idcommessa);

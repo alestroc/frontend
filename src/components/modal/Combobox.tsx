@@ -104,7 +104,7 @@ export default function Combobox({
             ? `${optionIdPrefix}-${visibleOptions[highlightedIndex].id}`
             : undefined
         }
-        className="w-full rounded-md  px-3 py-2 bg-white text-slate-900 border border-slate-300 placeholder-slate-400 focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition-colors"
+        className="w-full rounded-md px-3 py-2 bg-white text-slate-900 border border-slate-300 placeholder-slate-400 focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition-colors"
         placeholder={placeholder}
         value={displayValue}
         onFocus={() => {

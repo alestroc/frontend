@@ -19,7 +19,6 @@ interface EntryRowEditorProps {
   onUpdate: (patch: Partial<EntryRow>) => void;
   onRemove?: () => void;
   onAdd?: () => void;
-  // true -> mostra anche ore + nota (usata in SingleDayForm).
   isSingleDay: boolean;
 }
 

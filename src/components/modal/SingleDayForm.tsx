@@ -20,6 +20,7 @@ import {
 } from "../../config";
 import { addFavorite, removeFavorites } from "../../functions/favorites";
 import SwitchButton from "./SwitchButton";
+import ClearIcon from "@mui/icons-material/Clear";
 
 interface SingleDayFormProps {
   entries: TimeEntry[];
@@ -112,15 +113,22 @@ export default function SingleDayForm({
 
   return (
     <>
-      <div className="flex justify-between px-5">
-        <h2 className="pt-5 text-xl font-semibold text-primary ">
-          Inserimento Singolo
-        </h2>
-        <SwitchButton
-          setIsSingleDayMode={setIsSingleDayMode}
-          isSingleDayMode={isSingleDayMode}
+      <div className="flex  px-5">
+        <div className="flex justify-between w-full">
+          <h2 className="pt-5 text-xl font-semibold text-primary ">
+            Inserimento Singolo
+          </h2>
+          <SwitchButton
+            setIsSingleDayMode={setIsSingleDayMode}
+            isSingleDayMode={isSingleDayMode}
+          />
+        </div>
+        <ClearIcon
+          onClick={onClose}
+          className="relative top-2 left-2 rounded-full hover:bg-danger/30 "
         />
       </div>
+
       <div className="flex justify-between h-55 shrink-0 gap-2 min-h-35 px-4">
         <div className="flex-1 rounded-md border border-divider-soft bg-base overflow-hidden">
           <h4 className="px-6 my-2 text-sm font-medium text-primary">
