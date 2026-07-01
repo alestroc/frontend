@@ -25,8 +25,6 @@ export default function SortableItem({
   const { ref, handleRef, isDragging } = useSortable({ id, index });
   const [isButtonDisabled, setisButtonDisabled] = useState(false);
 
-  // Lookup live del nome: quando `commesse` arriva dal backend,
-  // questo si aggiorna automaticamente (vs il "?" cached in App.processedFavorites).
   const nomecommessa =
     commesse.find((c) => c.id === favorite.idcommessa)?.name ??
     favorite.nomecommessa;
@@ -54,7 +52,7 @@ export default function SortableItem({
         onClick={() => autocompleteFavorite(favorite)}
         className="flex-5 truncate text-start m-2 cursor-pointer"
       >
-        {nomecommessa}
+        {favorite.idcommessa}-{nomecommessa}
       </p>
       <p
         onClick={() => autocompleteFavorite(favorite)}

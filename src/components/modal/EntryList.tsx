@@ -39,7 +39,7 @@ export default function EntryList({
           >
             <div className="flex flex-row justify-between w-full p-2 text-sm text-black truncate">
               <span className="flex-4 font-semibold truncate">
-                {entry.nomecommessa}
+                {entry.idcommessa} - {entry.nomecommessa}
               </span>
               <span className="flex-2 text-xs text-gray-600 mx-5">
                 {entry.idarticolo} · {entry.ore}h
@@ -48,28 +48,32 @@ export default function EntryList({
                 {entry.nota}
               </span>
             </div>
-            <button
-              type="button"
-              aria-label={
-                isFavorite ? "Rimuovi dai preferiti" : "Aggiungi ai preferiti"
-              }
-              title={
-                isFavorite ? "Rimuovi dai preferiti" : "Aggiungi ai preferiti"
-              }
-              className={[
-                "text-xs font-semibold shrink-0 m-2 transition-colors",
-                isFavorite
-                  ? "text-yellow-400 hover:text-red-500"
-                  : "text-slate-300 hover:text-yellow-400",
-              ].join(" ")}
-              onClick={() =>
-                isFavorite
-                  ? onRemoveFavorite(existingFavorite.id)
-                  : onInsertFavorite(entry)
-              }
-            >
-              <StarIcon />
-            </button>
+            {entry.idcommessa != "NON-OPERATIVO" ? (
+              <button
+                type="button"
+                aria-label={
+                  isFavorite ? "Rimuovi dai preferiti" : "Aggiungi ai preferiti"
+                }
+                title={
+                  isFavorite ? "Rimuovi dai preferiti" : "Aggiungi ai preferiti"
+                }
+                className={[
+                  "text-xs font-semibold shrink-0 m-2 transition-colors",
+                  isFavorite
+                    ? "text-yellow-400 hover:text-red-500"
+                    : "text-slate-300 hover:text-yellow-400",
+                ].join(" ")}
+                onClick={() =>
+                  isFavorite
+                    ? onRemoveFavorite(existingFavorite.id)
+                    : onInsertFavorite(entry)
+                }
+              >
+                <StarIcon />
+              </button>
+            ) : (
+              ""
+            )}
           </div>
         );
       })}
