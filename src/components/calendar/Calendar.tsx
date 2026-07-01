@@ -66,6 +66,10 @@ export default function Calendar({
     );
   }
 
+  // Multi-select è attivo quando il parent passa selectedDays (array) invece
+  // di selected (singola key). Serve al CalendarCell per il tooltip corretto.
+  const isMultiSelect = selectedDays != null;
+
   function renderCell(date: Date) {
     const key = dateToKey(date);
     const isSelected = selectedDays
@@ -80,6 +84,7 @@ export default function Calendar({
         isSelected={isSelected}
         disabled={isDisabled(date)}
         isModal={isModal}
+        isMultiSelect={isMultiSelect}
         view={view}
         settings={settings ? settings : null}
         onClick={() => handleClickDay?.(key)}

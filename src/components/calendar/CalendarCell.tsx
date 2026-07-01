@@ -8,6 +8,8 @@ interface CalendarCellProps {
   isSelected: boolean;
   disabled: boolean;
   isModal: boolean;
+  // true nel MultiDayForm: chiarisce nel tooltip che il click aggiunge/rimuove
+  isMultiSelect?: boolean;
   view: string;
   onClick: () => void;
   settings: ApiSettings | null;
@@ -20,6 +22,7 @@ export default function CalendarCell({
   isSelected,
   disabled,
   isModal,
+  isMultiSelect = false,
   view,
   settings,
   onClick,
@@ -29,16 +32,31 @@ export default function CalendarCell({
     0,
   );
 
+  const isComplete = isModal && totalHours === settings?.maxHours;
+  const isPartial = isModal && totalHours > 0 && !isComplete;
+
+  const tooltip = disabled
+    ? undefined
+    : isMultiSelect
+      ? isSelected
+        ? "Clicca di nuovo per rimuovere questo giorno"
+        : "Clicca per aggiungere questo giorno"
+      : "Clicca per selezionare questo giorno";
+
   return (
     <div
       onClick={() => !disabled && onClick()}
+      title={tooltip}
       style={{ display: "grid", gridTemplateRows: "auto 1fr auto" }}
       className={[
-        "p-1 border transition-colors overflow-hidden",
+        "p-1 border cursor-pointer border-divider transition-colors overflow-hidden",
         disabled
-          ? "opacity-40 cursor-not-allowed border-divider bg-surface/60"
-          : "cursor-pointer hover:border-accent-soft",
-        !disabled ? "bg-surface border-divider" : "",
+          ? "opacity-40 cursor-not-allowed bg-surface/60"
+          : isComplete
+            ? "bg-success/40 "
+            : isPartial
+              ? "bg-danger/40 "
+              : " hover:border-accent-soft bg-surface",
         isSelected ? "ring-2 ring-accent-soft ring-inset" : "",
       ].join(" ")}
     >
@@ -52,6 +70,7 @@ export default function CalendarCell({
       >
         {date.getDate()}
       </div>
+
       {!isModal && (
         <>
           <div className="flex flex-col overflow-auto">

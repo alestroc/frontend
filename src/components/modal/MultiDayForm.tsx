@@ -19,6 +19,7 @@ import {
 import { inputClass } from "../../functions/config";
 import ConfirmDialog from "./ConfirmDialog";
 import SwitchButton from "./SwitchButton";
+import ClearIcon from "@mui/icons-material/Clear";
 
 export interface MultiDayFormProps {
   entries: TimeEntry[];
@@ -107,11 +108,18 @@ export default function MultiDayForm({
 
   return (
     <>
-      <div className="flex justify-between px-5">
-        <h2 className=" pt-5 text-xl font-semibold ">Inserimento Multiplo</h2>
-        <SwitchButton
-          isSingleDayMode={isSingleDayMode}
-          setIsSingleDayMode={setIsSingleDayMode}
+      <div className="flex px-5">
+        <div className="flex justify-between w-full">
+          <h2 className=" pt-5 text-xl font-semibold ">Inserimento Multiplo</h2>
+          <SwitchButton
+            isSingleDayMode={isSingleDayMode}
+            setIsSingleDayMode={setIsSingleDayMode}
+          />
+        </div>
+
+        <ClearIcon
+          onClick={onClose}
+          className="relative top-2 left-2 rounded-full hover:bg-danger/30 "
         />
       </div>
       <div className="flex flex-col p-2 ">
@@ -127,6 +135,9 @@ export default function MultiDayForm({
 
       <div className="flex gap-3 p-3 max-h-60">
         <div className="flex-1 rounded-md border border-divider-soft bg-base overflow-hidden">
+          <p className="px-3 pt-2 text-xs text-muted">
+            Seleziona uno o più giorni. Clicca nuovamente per deselezionare.
+          </p>
           <Calendar
             entries={entries}
             settings={settings}
@@ -197,6 +208,16 @@ export default function MultiDayForm({
                 <p className="flex flex-1 text-xs text-primary align-center">
                   {availableHours}h disponibili
                 </p>
+                {availableHours == 0 ? (
+                  <ClearIcon
+                    className="cursor-pointer rounded-full hover:bg-danger/30"
+                    onClick={() => {
+                      toggleDay(day);
+                    }}
+                  />
+                ) : (
+                  ""
+                )}
               </div>
             </>
           );
