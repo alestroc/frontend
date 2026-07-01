@@ -33,14 +33,12 @@ export async function getFavorites(): Promise<Favorite[]> {
 
   if (data.length === 0) return [];
 
-  const output = data.map((favorite: Favorite) => ({
+  return data.map((favorite: Favorite) => ({
     id: favorite.id,
     idcommessa: favorite.idcommessa,
     idarticolo: favorite.idarticolo,
     order_no: favorite.order_no,
   }));
-
-  return output;
 }
 
 export async function addFavorite(favorite: TimeEntry): Promise<boolean> {

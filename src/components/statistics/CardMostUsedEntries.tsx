@@ -27,36 +27,30 @@ export default function CardMostUsedEntries({
       }
     >();
 
+    // Confronto date come stringhe YYYY-MM-DD: ordine lessicografico = ordine cronologico.
+    const daKey = da.toISOString().slice(0, 10);
+    const aKey = a.toISOString().slice(0, 10);
+
     for (const e of entries) {
-      const giornoDate = new Date(e.giorno);
-      //controllo se è presente nel range specificato
-      //ritorna true se la data è più recente
-      if (giornoDate < da || giornoDate > a) {
+      if (
+        e.giorno < daKey ||
+        e.giorno > aKey ||
+        e.idcommessa === "NON-OPERATIVO"
+      )
         continue;
-      }
-      if (!map.has(e.nomecommessa)) {
-        // controllo se è già presente, se no, lo aggiungo
-        map.set(e.nomecommessa, {
-          ore: Number(e.ore),
-          nRegistrazioni: 1,
-          primaRegistrazione: e.giorno,
-          ultimaRegistrazione: e.giorno,
-        });
-        //esco dal ciclo attuale perché non devo aggiornare nessun dato
-        continue;
-      }
-      const mapValue = map.get(e.nomecommessa);
-      if (!mapValue) continue;
-      //caso in cui la commessa è già presente nella mappa, devo aggiornare i dati
-      //controllo se la data è più recente o vecchia del dato salvato
-      if (e.giorno > mapValue.ultimaRegistrazione) {
-        mapValue.ultimaRegistrazione = e.giorno;
-      }
-      if (e.giorno < mapValue.primaRegistrazione) {
-        mapValue.primaRegistrazione = e.giorno;
-      }
-      mapValue.ore += Number(e.ore);
-      mapValue.nRegistrazioni++;
+      // "get o default": una sola branch, niente if/else duplicati.
+      const cur = map.get(e.nomecommessa) ?? {
+        ore: 0,
+        nRegistrazioni: 0,
+        primaRegistrazione: e.giorno,
+        ultimaRegistrazione: e.giorno,
+      };
+      cur.ore += Number(e.ore);
+      cur.nRegistrazioni++;
+      if (e.giorno > cur.ultimaRegistrazione)
+        cur.ultimaRegistrazione = e.giorno;
+      if (e.giorno < cur.primaRegistrazione) cur.primaRegistrazione = e.giorno;
+      map.set(e.nomecommessa, cur);
     }
 
     // da Map ad array piatto, ordinato per ore decrescente e prende la top 3
